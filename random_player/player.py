@@ -1,4 +1,4 @@
-from ACCESS_GRANTED.action import *
+from random_player.action import *
 import random
 
 class Player:

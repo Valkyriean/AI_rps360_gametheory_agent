@@ -9,7 +9,8 @@
             "type": "python",
             "request": "launch",
             "module": "referee",
-            "args":["-l", "-u", "ACCESS_GRANTED","random"]
+            "args":["-l", "-c", "ACCESS_GRANTED","random_player"]
         }
     ]
 }
+// python3 -m referee ACCESS_GRANTED ACCESS_GRANTED > out.txt

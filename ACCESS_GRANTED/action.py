@@ -1,36 +1,35 @@
 from ACCESS_GRANTED.token import *
 
-def update_enemy(opponent_action, enemy_list):
-    action = opponent_action[0]
+def update_state(action_tuple, state, friendly):
+    action = action_tuple[0]
     if (action == "THROW"):
-        symbol  = opponent_action[1]
-        cord = opponent_action[2]
-        enemy = Token(symbol,cord)
-        enemy_list.append(enemy)
+        symbol  = action_tuple[1]
+        cord = action_tuple[2]
+        if friendly:
+            token = Token(symbol,cord)
+            state.friendly_list.append(token)
+            state.friendly_thrown += 1
+        else:
+            enemy = Token(symbol,cord)
+            state.enemy_list.append(enemy)
+            state.enemy_thrown += 1
     else:
-        cord = opponent_action[1]
-        for enmey in enemy_list:
-            if(enmey.cord == cord):
-                enmey.cord = opponent_action[2]
-                break
-
-def update_player(player_action, friendly_list, player):
-    action = player_action[0]
-    if (action == "THROW"):
-        symbol  = player_action[1]
-        cord = player_action[2]
-        token = Token(symbol,cord)
-        friendly_list.append(token)
-        player.thrown_count += 1
-    else:
-        cord = player_action[1]
-        for token in friendly_list:
+        cord = action_tuple[1]
+        if friendly:
+            token_list = state.friendly_list
+        else:
+            token_list = state.enemy_list
+        for token in token_list:
             if(token.cord == cord):
-                token.cord = player_action[2]
+                token.cord = action_tuple[2]
                 break
 
-def throw_list(thrown_count ,player):
 
+
+def throw_list(state, player):
+    if state.friendly_thrown > 8:
+        return []
+    thrown_count = state.friendly_thrown
     throw_list = []
     symbols = ['s','r','p']
     p = -1
@@ -44,18 +43,18 @@ def throw_list(thrown_count ,player):
     return throw_list
 
 
-def slide_list(friendly_list):
+def slide_list(state):
     slide_list = []
-    for friednly in friendly_list:
+    for friednly in state.friendly_list:
         potential_slide_list = potential_slide(friednly.cord)
         for potential_slide_move in potential_slide_list:
             slide_list.append(Slide(friednly, potential_slide_move))
     return slide_list
 
-def swing_list(friendly_list):
+def swing_list(state):
     swing_list = []
-    for friednly in friendly_list:
-        potential_swing_list = potential_swing(friednly.cord, friendly_list)
+    for friednly in state.friendly_list:
+        potential_swing_list = potential_swing(friednly.cord, state.friendly_list)
         for potential_swing_move in potential_swing_list:
             swing_list.append(Swing(friednly, potential_swing_move))
     return swing_list
@@ -72,7 +71,7 @@ class Throw(Action):
     def __init__(self, token):
         super().__init__(token, token.cord)
         
-    def toTuple(self):
+    def to_tuple(self):
         return (self.action, self.token.symbol, self.tar)
 
 
@@ -82,7 +81,7 @@ class Swing(Action):
     def __init__(self, token, tar):
         super().__init__(token, tar)
     
-    def toTuple(self):
+    def to_tuple(self):
         return (self.action, self.token.cord, self.tar)
 
 class Slide(Action):
@@ -91,7 +90,7 @@ class Slide(Action):
     def __init__(self, token, tar):
         super().__init__(token, tar)
 
-    def toTuple(self):
+    def to_tuple(self):
         return (self.action, self.token.cord, self.tar)
         
 

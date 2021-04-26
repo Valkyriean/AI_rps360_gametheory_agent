@@ -3,6 +3,10 @@ class Token:
         self.symbol = symbol
         self.cord = cord
 
+    def copy(self):
+        new_token = Token(self.symbol, self.cord)
+        return new_token
+
 
 move_vector_list = [(0, -1), (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0)]
 
@@ -55,18 +59,15 @@ def remove_out_bound(potential_move_list):
     return potential_move_list
 
 
-def settle(friendly_list, enemy_list):
-    friendly_list_copy = friendly_list.copy()
-    enemy_list_copy = enemy_list.copy()
-
-    token_list = friendly_list.copy() + enemy_list.copy()
+def settle(state):
+    token_list = state.friendly_list.copy() + state.enemy_list.copy()
     for token1 in token_list:
         for token2 in token_list:
             if token1.cord == token2.cord and can_defeat(token1,token2) == 1:
-                if token2 in enemy_list:
-                    enemy_list.remove(token2)
-                elif token2 in friendly_list:
-                    friendly_list.remove(token2)
+                if token2 in state.enemy_list:
+                    state.enemy_list.remove(token2)
+                elif token2 in state.friendly_list:
+                    state.friendly_list.remove(token2)
 
 
 

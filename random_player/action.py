@@ -1,4 +1,4 @@
-from ACCESS_GRANTED.token import *
+from random_player.token import *
 
 def update_enemy(opponent_action, enemy_list):
     action = opponent_action[0]

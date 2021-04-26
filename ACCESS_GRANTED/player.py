@@ -1,5 +1,5 @@
 from ACCESS_GRANTED.action import *
-import random
+from ACCESS_GRANTED.state import *
 
 class Player:
     def __init__(self, player):
@@ -12,9 +12,8 @@ class Player:
         as Lower).
         """
         # put your code here
-        self.friendly_list = []
-        self.enemy_list = []
-        self.thrown_count = 0
+
+        self.state = State()
         self.player = player
 
     def action(self):
@@ -24,13 +23,15 @@ class Player:
         """
         # put your code here
         action_list = []
-        if self.thrown_count < 9:
-            action_list += throw_list(self.thrown_count, self.player)
-        action_list += slide_list(self.friendly_list)
-        action_list += swing_list(self.friendly_list)
+        action_list += throw_list(self.state, self.player)
+        action_list += slide_list(self.state)
+        action_list += swing_list(self.state)
+
+        state_list = actions_to_states(self.state, action_list)
+
 
         # list of all valid action
-        return random.choice(action_list).toTuple()
+        return best_action(state_list).to_tuple()
         # choose one
     
     def update(self, opponent_action, player_action):
@@ -42,7 +43,7 @@ class Player:
         and player_action is this instance's latest chosen action.
         """
         # put your code here
-        update_enemy(opponent_action, self.enemy_list)
-        update_player(player_action, self.friendly_list, self)
+        update_state(player_action, self.state, True)
+        update_state(opponent_action, self.state, False)
         
-        settle(self.friendly_list, self.enemy_list)
+        settle(self.state)
