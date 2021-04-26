@@ -30,20 +30,16 @@ def update_player(player_action, friendly_list, player):
                 break
 
 def throw_list(thrown_count ,player):
-    # if thrown_count is 9:
-    #     return [Throw(Token('r',(0,0)))]
+
     throw_list = []
-    valid_q_dict = {4:(-4,0), 3:(-4,1), 2:(-4,2),1:(-4,3),
-    0:(-4,4),-1:(-3,4),-2:(-2,4),-3:(-1,4),-4:(0,4)}
     symbols = ['s','r','p']
     p = -1
     if player == "upper":
         p = 1
     for r in range(4*p, (4-thrown_count)*p - p, -1*p):
-        (q_min,q_max) = valid_q_dict[r]
-        for q in range(q_min, q_max + 1):
+        pos = 1 if r>0 else -1
+        for q in range(-1*pos*4, pos*4-r+pos, pos):
             for s in symbols:
-                #print(s + str(r) + "," + str(q))
                 throw_list.append(Throw(Token(s,(r,q))))
     return throw_list
 
