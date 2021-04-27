@@ -14,14 +14,14 @@ class State():
         self.enemy_thrown = 0
         self.friendly_score = 0
     
-    def copy(self):
-        new_state = State()
-        new_state.friendly_list = copy.deepcopy(self.friendly_list)
-        new_state.enemy_list = copy.deepcopy(self.enemy_list)
-        new_state.friendly_thrown = self.friendly_thrown
-        new_state.enemy_thrown = self.enemy_thrown
-        new_state.friendly_score = self.friendly_score
-        return new_state
+    # def copy(self):
+    #     new_state = State()
+    #     new_state.friendly_list = copy.deepcopy(self.friendly_list)
+    #     new_state.enemy_list = copy.deepcopy(self.enemy_list)
+    #     new_state.friendly_thrown = self.friendly_thrown
+    #     new_state.enemy_thrown = self.enemy_thrown
+    #     new_state.friendly_score = self.friendly_score
+    #     return new_state
 # action list to state list
 def actions_to_states(state, action_list):
     state_list = []
