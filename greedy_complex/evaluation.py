@@ -47,8 +47,8 @@ def eval_state(state):
         score -= 10
     for friendly in state.friendly_list:
         hasEnemy = defeat_score(friendly, state.enemy_list, -1)
-        if hasEnemy == 1:
-            score += -20 + dist_to_enemy(friendly, state.enemy_list, -1)
+        if hasEnemy == 1 and dist_to_enemy(friendly, state.enemy_list, -1) < 2:
+            score -= 50
         hasPrey = defeat_score(friendly, state.enemy_list, 1)
         if hasPrey ==1:
             score += 10 + 10*only_counter(friendly, state) - dist_to_enemy(friendly, state.enemy_list, 1)

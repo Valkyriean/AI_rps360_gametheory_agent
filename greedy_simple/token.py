@@ -3,10 +3,6 @@ class Token:
         self.symbol = symbol
         self.cord = cord
 
-    # def copy(self):
-    #     new_token = Token(self.symbol, self.cord)
-    #     return new_token
-
 
 move_vector_list = [(0, -1), (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0)]
 

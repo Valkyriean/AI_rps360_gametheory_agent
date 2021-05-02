@@ -26,7 +26,7 @@ class Player:
         action_list += throw_list(self.state, self.player)
         action_list += slide_list(self.state)
         action_list += swing_list(self.state)
-
+        # remove_friendly_fire(self.state,action_list)
         state_list = actions_to_states(self.state, action_list)
 
 

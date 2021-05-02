@@ -59,6 +59,15 @@ def swing_list(state):
             swing_list.append(Swing(friednly, potential_swing_move))
     return swing_list
 
+
+def remove_friendly_fire(state,action_list):
+    action_list_copy = action_list.copy()
+    for action in action_list_copy:
+        for friendly in state.friendly_list:
+            if action.token != friendly and action.tar == friendly.cord and can_defeat(action.token,friendly) != 0 and action in action_list:
+                action_list.remove(action)
+
+                
 class Action:
     def __init__(self, token, tar):
         self.tar = tar
