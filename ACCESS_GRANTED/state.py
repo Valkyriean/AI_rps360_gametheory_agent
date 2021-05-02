@@ -40,7 +40,7 @@ def best_action(state):
         update_state(action.to_tuple(), new_state, True)
         settle(new_state)
         # score = minimax(False, new_state, 1)
-        score = simple_eval_state(state)
+        score = simple_eval_state(new_state)
         if score > best_score:
             best_action_list = [action]
             best_score = score
