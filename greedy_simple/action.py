@@ -65,6 +65,16 @@ def remove_friendly_fire(state,action_list):
         for friendly in state.friendly_list:
             if action.token != friendly and action.tar == friendly.cord and can_defeat(action.token,friendly) != 0:
                 action_list.remove(action)
+def check_duplicated_state(state):
+    temp = []
+    for i in state.friendly_list:
+        temp.append((i.cord, i.symbol))
+    temp.append(state.friendly_thrown)
+    state.history[tuple(temp)] += 1
+    if state.history[tuple(temp)] >= 3:
+        print(list(state.history.most_common(3)))
+        return False
+    return True
 
 class Action:
     def __init__(self, token, tar):

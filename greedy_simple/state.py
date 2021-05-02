@@ -2,6 +2,7 @@ from greedy_simple.action import *
 from greedy_simple.evaluation import *
 import random
 import copy
+import collections
 
 MAX_THOROWN = 8
 
@@ -13,6 +14,7 @@ class State():
         self.friendly_thrown = 0
         self.enemy_thrown = 0
         self.score = -9999
+        self.history = collections.Counter()
     
 
 # action list to state list
