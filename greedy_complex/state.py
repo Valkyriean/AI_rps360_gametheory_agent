@@ -39,6 +39,7 @@ def best_action(state_list):
             best_action_list.append(action)
     return random.choice(best_action_list)
 
+
 # action + state to new state
 
 

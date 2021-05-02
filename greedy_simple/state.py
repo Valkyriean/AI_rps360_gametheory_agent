@@ -37,8 +37,20 @@ def best_action(state_list):
             best_score = state.score
         elif state.score == best_score:
             best_action_list.append(action)
+        check_duplicated_state(state)
     return random.choice(best_action_list)
 
+def check_duplicated_state(state):
+    temp = tuple()
+    state.friendly_list.sort()
+    for i in state.friendly_list:
+        temp += (i.cord,i.symbol)
+    temp += tuple(state.friendly_thrown)
+    state.history[temp] += 1
+    print(list(state.history.elements()))
+    if state.history[temp] >= 3:
+        return False
+    return True
 # action + state to new state
 
 

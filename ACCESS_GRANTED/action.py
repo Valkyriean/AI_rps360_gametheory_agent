@@ -26,14 +26,30 @@ def update_state(action_tuple, state, friendly):
 
 
 
-def throw_list(state, player):
+def throw_list(state):
     if state.friendly_thrown > 8:
         return []
     thrown_count = state.friendly_thrown
     throw_list = []
     symbols = ['s','r','p']
     p = -1
-    if player == "upper":
+    if state.player == "upper":
+        p = 1
+    for r in range(4*p, (4-thrown_count)*p - p, -1*p):
+        pos = 1 if r>0 else -1
+        for q in range(-1*pos*4, pos*4-r+pos, pos):
+            for s in symbols:
+                throw_list.append(Throw(Token(s,(r,q))))
+    return throw_list
+
+def enemy_throw_list(state):
+    if state.enemy_thrown > 8:
+        return []
+    thrown_count = state.enemy_thrown
+    throw_list = []
+    symbols = ['s','r','p']
+    p = -1
+    if state.player == "lower":
         p = 1
     for r in range(4*p, (4-thrown_count)*p - p, -1*p):
         pos = 1 if r>0 else -1
@@ -51,6 +67,14 @@ def slide_list(state):
             slide_list.append(Slide(friednly, potential_slide_move))
     return slide_list
 
+def enemy_slide_list(state):
+    slide_list = []
+    for enemy in state.enemy_list:
+        for potential_slide_move in potential_slide(enemy.cord):
+            slide_list.append(Slide(enemy, potential_slide_move))
+    return slide_list
+
+
 def swing_list(state):
     swing_list = []
     for friednly in state.friendly_list:
@@ -59,11 +83,25 @@ def swing_list(state):
             swing_list.append(Swing(friednly, potential_swing_move))
     return swing_list
 
-def action_list(state):
+def enemy_swing_list(state):
+    swing_list = []
+    for enemy in state.enemy_list:
+        for potential_swing_move in potential_swing(enemy.cord, state.enemy_list):
+            swing_list.append(Swing(enemy, potential_swing_move))
+    return swing_list
+
+
+def action_list(state, isFriendlyTurn):
     action_list = []
-    action_list += throw_list(state, state.player)
-    action_list += slide_list(state)
-    action_list += swing_list(state)
+    if isFriendlyTurn:
+        action_list += swing_list(state)
+        action_list += slide_list(state)
+        action_list += throw_list(state)
+
+    else:
+        action_list += enemy_swing_list(state)
+        action_list += enemy_slide_list(state)
+        action_list += enemy_throw_list(state)
     return action_list
 
 class Action:

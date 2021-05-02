@@ -23,6 +23,10 @@ class Player:
         """
         # put your code here
         # list of all valid action
+        # if self.state.friendly_thrown < 9:
+        #     return random_throw(self.state).to_tuple()
+
+
         return best_action(self.state).to_tuple()
         # choose one
     

@@ -2,7 +2,8 @@ class Token:
     def __init__(self, symbol, cord):
         self.symbol = symbol
         self.cord = cord
-
+    def __lt__(self, other):
+        return self.cord < other.cord
 
 move_vector_list = [(0, -1), (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0)]
 
