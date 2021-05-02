@@ -59,6 +59,13 @@ def swing_list(state):
             swing_list.append(Swing(friednly, potential_swing_move))
     return swing_list
 
+def action_list(state):
+    action_list = []
+    action_list += throw_list(state, state.player)
+    action_list += slide_list(state)
+    action_list += swing_list(state)
+    return action_list
+
 class Action:
     def __init__(self, token, tar):
         self.tar = tar

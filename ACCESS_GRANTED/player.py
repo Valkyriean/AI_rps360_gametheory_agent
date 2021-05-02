@@ -12,7 +12,7 @@ class Player:
         as Lower).
         """
         # put your code here
-
+        State.player = player
         self.state = State()
         self.player = player
 
@@ -22,16 +22,8 @@ class Player:
         of the game, select an action to play this turn.
         """
         # put your code here
-        action_list = []
-        action_list += throw_list(self.state, self.player)
-        action_list += slide_list(self.state)
-        action_list += swing_list(self.state)
-
-        state_list = actions_to_states(self.state, action_list)
-
-
         # list of all valid action
-        return best_action(state_list).to_tuple()
+        return best_action(self.state).to_tuple()
         # choose one
     
     def update(self, opponent_action, player_action):

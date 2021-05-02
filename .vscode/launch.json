@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "referee",
-            "args":["-l", "-c", "greedy_simple","greedy_complex"]
+            "args":["-l", "-c", "ACCESS_GRANTED","greedy_complex"]
         }
     ]
 }

@@ -69,7 +69,11 @@ def settle(state):
                 elif token2 in state.friendly_list:
                     state.friendly_list.remove(token2)
 
-
+# calculate hexagonal Manhattan Distance
+def dist_to(friednly, enemy):
+    (r_o, q_o) = friednly.cord
+    (r_e, q_e) = enemy.cord
+    return max(abs(r_e - r_o), abs(q_e - q_o), abs(q_o - q_e + r_o - r_e))
 
 '''
 # remove the movement will be defeated by lower token
