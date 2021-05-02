@@ -1,5 +1,5 @@
-from ACCESS_GRANTED.action import *
-from ACCESS_GRANTED.evaluation import *
+from greedy_simple.action import *
+from greedy_simple.evaluation import *
 import random
 import copy
 

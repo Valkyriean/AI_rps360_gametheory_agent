@@ -1,0 +1,1 @@
+from greedy_simple.player import Player

@@ -1,5 +1,5 @@
-from ACCESS_GRANTED.action import *
-from ACCESS_GRANTED.evaluation import *
+from greedy_complex.action import *
+from greedy_complex.evaluation import *
 import random
 import copy
 
@@ -22,7 +22,7 @@ def actions_to_states(state, action_list):
         new_state = copy.deepcopy(state)
         update_state(action.to_tuple(), new_state, True)
         settle(new_state)
-        new_state.score = simple_eval_state(new_state)
+        new_state.score = eval_state(new_state)
         state_list.append((new_state,action))
     return state_list
 

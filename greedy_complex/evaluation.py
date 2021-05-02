@@ -1,4 +1,4 @@
-from ACCESS_GRANTED.token import *
+from greedy_complex.token import *
 
 # score state
 # calculate hexagonal Manhattan Distance
@@ -52,9 +52,9 @@ def eval_state(state):
         hasPrey = defeat_score(friendly, state.enemy_list, 1)
         if hasPrey ==1:
             score += 10 + 10*only_counter(friendly, state) - dist_to_enemy(friendly, state.enemy_list, 1)
-    state.score = score
+    return score
 
 def simple_eval_state(state):
-    friendly = (8-state.friendly_thrown)*1.1 + len(state.friendly_list)
-    enemy = (8-state.enemy_thrown)*1.1 + len(state.enemy_list)
+    friendly = (8-state.friendly_thrown) + len(state.friendly_list)
+    enemy = (8-state.enemy_thrown) + len(state.enemy_list)
     return friendly - enemy
