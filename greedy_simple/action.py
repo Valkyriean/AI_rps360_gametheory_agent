@@ -9,6 +9,7 @@ def update_state(action_tuple, state, friendly):
             token = Token(symbol,cord)
             state.friendly_list.append(token)
             state.friendly_thrown += 1
+            state.history.clear()
         else:
             enemy = Token(symbol,cord)
             state.enemy_list.append(enemy)
@@ -72,7 +73,6 @@ def check_duplicated_state(state):
     temp.append(state.friendly_thrown)
     state.history[tuple(temp)] += 1
     if state.history[tuple(temp)] >= 3:
-        print(list(state.history.most_common(3)))
         return False
     return True
 
