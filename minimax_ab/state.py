@@ -1,5 +1,4 @@
-from ACCESS_GRANTED.action import *
-from gametheory import *
+from minimax_ab.action import *
 import random
 import copy
 
@@ -117,27 +116,3 @@ def min_value(state, alpha, beta, depth):
         if min_score < beta:
             beta = min_score
     return min_score
-
-def game_theory_matrix(state):
-    v = []
-    for i in state.friendly_list:
-        row = []
-        for j in state.enemy_list:
-            row.append(can_defeat(i, j) * 20/dist_to(i, j))
-        v.append(row)
-    return v
-
-def simle_game_theory(state):
-    new_state = copy.deepcopy(state)
-    friendly_action = action_list(new_state, True)
-    enemy_action = action_list(new_state, False)
-    for i in friendly_action:
-        new_state_1 = copy.deepcopy(new_state)
-        update_state(i.to_tuple(), new_state_1, True)
-        for j in enemy_action:
-            new_state_2 = copy.deepcopy(new_state_1)
-            update_state(j.to_tuple(), new_state_2, False)
-            print(game_theory_matrix(new_state_2))
-            s,v = solve_game(game_theory_matrix(new_state_2))
-            # print(s,v)
-    return random.choice(friendly_action)
