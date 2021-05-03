@@ -23,7 +23,18 @@ def simple_eval_state(state):
 
 
 def random_throw(state):
-    return random.choice(throw_list(state))
+    thrown_count = state.friendly_thrown
+    throw_list = []
+    symbols = ['s','r','p']
+    p = -1
+    if state.player == "upper":
+        p = 1
+    r = (4-thrown_count)*p
+
+    pos = 1 if r>0 else -1
+    q = random.choice(range(-1*pos*4, pos*4-r+pos, pos))
+    return ("THROW", symbols[thrown_count%3], (r,q))
+
 
 
 

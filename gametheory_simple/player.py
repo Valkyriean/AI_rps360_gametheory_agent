@@ -8,20 +8,14 @@ class Player:
         State.player = player
         self.state = State()
         self.player = player
-        self.turn = -1
 
     def action(self):
 
         # if self.state.friendly_thrown < 9:
         #     return random_throw(self.state).to_tuple()
 
-        self.turn += 1
-        if self.turn < 3:
-            row = 4 - self.turn
-            symbols = ['s','r','p']
-            if self.state.player == "lower":
-                row = row*-1
-            return ("THROW",symbols[self.turn%3], (row,-2))
+        if self.state.friendly_thrown < 3:
+            return random_throw(self.state)
 
 
         return game_theory_simple(self.state).to_tuple()
