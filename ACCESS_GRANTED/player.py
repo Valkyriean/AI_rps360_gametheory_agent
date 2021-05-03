@@ -27,7 +27,7 @@ class Player:
         #     return random_throw(self.state).to_tuple()
 
 
-        return best_action(self.state).to_tuple()
+        return simle_game_theory(self.state).to_tuple()
         # choose one
     
     def update(self, opponent_action, player_action):

@@ -1,6 +1,6 @@
 from greedy_simple.action import *
 from greedy_simple.state import *
-
+from gametheory import *
 class Player:
     def __init__(self, player):
         """
@@ -28,7 +28,6 @@ class Player:
         action_list += swing_list(self.state)
         # remove_friendly_fire(self.state,action_list)
         state_list = actions_to_states(self.state, action_list)
-
 
         # list of all valid action
         return best_action(state_list).to_tuple()
