@@ -8,15 +8,13 @@ def dist_to(friednly, enemy):
     return max(abs(r_e - r_o), abs(q_e - q_o), abs(q_o - q_e + r_o - r_e))
 
 
-def dist_to_enemy(token, enemy_list, win):
-    min_dist = 0
-    first = True
+def dist_to_enemy(token, enemy_list):
+    min_dist = 999
     for enemy in enemy_list:
-        if can_defeat(token, enemy) == win:
+        if can_defeat(token, enemy) == 1:
             dist = dist_to(token,enemy)
-            if dist < min_dist or first:
+            if dist < min_dist:
                 min_dist = dist
-                first = False
     return min_dist
 
 def defeat_score(token, enemy_list, win):
@@ -54,7 +52,13 @@ def eval_state(state):
             score += 10 + 10*only_counter(friendly, state) - dist_to_enemy(friendly, state.enemy_list, 1)
     return score
 
+
 def simple_eval_state(state):
-    friendly = (8-state.friendly_thrown) + len(state.friendly_list)
-    enemy = (8-state.enemy_thrown) + len(state.enemy_list)
-    return friendly - enemy
+    friendly = (8-state.friendly_thrown)*1.08 + len(state.friendly_list)
+    enemy = (8-state.enemy_thrown)*1.08 + len(state.enemy_list)
+    base = (friendly - enemy)*100
+    for friendly in state.friendly_list:
+        dist = dist_to_enemy(friendly, state.enemy_list)
+        if dist != 999:
+            base += (8 - dist)
+    return base

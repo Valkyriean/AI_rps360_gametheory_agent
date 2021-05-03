@@ -1,5 +1,5 @@
-from gametheory_simple.action import *
-from gametheory_simple.state import *
+from gametheory_complex.action import *
+from gametheory_complex.state import *
 import time
 
 

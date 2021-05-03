@@ -4,9 +4,6 @@ class Token:
         self.cord = cord
 
 
-
-
-
 move_vector_list = [(0, -1), (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0)]
 
 # check whether can eliminate enemy token

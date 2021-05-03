@@ -1,4 +1,4 @@
-from gametheory_simple.action import *
+from gametheory_complex.action import *
 from gametheory import *
 import random
 import copy
@@ -38,13 +38,13 @@ def dist_to_enemy(token, enemy_list):
 
 
 def simple_eval_state(state):
-    friendly = (8-state.friendly_thrown)*1.08 + len(state.friendly_list)
-    enemy = (8-state.enemy_thrown)*1.08 + len(state.enemy_list)
+    friendly = (8-state.friendly_thrown)*1.05 + len(state.friendly_list)
+    enemy = (8-state.enemy_thrown)*1.05 + len(state.enemy_list)
     base = (friendly - enemy)*100
-    # for friendly in state.friendly_list:
-    #     dist = dist_to_enemy(friendly, state.enemy_list)
-    #     if dist != 999:
-    #         base += (8 - dist)
+    for friendly in state.friendly_list:
+        dist = dist_to_enemy(friendly, state.enemy_list)
+        if dist != 999:
+            base += (8 - dist)
     return base
 
 

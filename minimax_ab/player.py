@@ -41,5 +41,4 @@ class Player:
         # put your code here
         update_state(player_action, self.state, True)
         update_state(opponent_action, self.state, False)
-        
         settle(self.state)

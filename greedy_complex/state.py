@@ -22,7 +22,7 @@ def actions_to_states(state, action_list):
         new_state = copy.deepcopy(state)
         update_state(action.to_tuple(), new_state, True)
         settle(new_state)
-        new_state.score = eval_state(new_state)
+        new_state.score = simple_eval_state(new_state)
         state_list.append((new_state,action))
     return state_list
 
@@ -31,7 +31,7 @@ def best_action(state_list):
     best_score = -9999
     best_action_list = []
     for (state,action) in state_list:
-        #print(str(state.score) + " "+str(action.action)+" " + str(action.token.symbol))
+        # print(str(state.score) + " "+str(action.action)+" " + str(action.token.symbol))
         if state.score > best_score:
             best_action_list = [action]
             best_score = state.score
