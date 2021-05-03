@@ -3,7 +3,7 @@ import random
 import copy
 
 MAX_THOROWN = 8
-MAX_DEPTH = 3
+MAX_DEPTH = 8
 
 class State():
     player = None
@@ -37,23 +37,24 @@ def best_action(state):
     alpha = -9999
     beta = 9999
     best_action_list = []
+    best_action = None
     for action in action_list(state,True):
         new_state = copy.deepcopy(state)
         update_state(action.to_tuple(), new_state, True)
         settle(new_state)
         score = min_value(state, alpha, beta, 1)
         if score > best_score:
-            best_action_list = [action]
+            best_action = action
             best_score = score
-        elif score == best_score:
-            best_action_list.append(action)
+        # elif score == best_score:
+        #     best_action_list.append(action)
         if best_score >= beta:
             return best_score
         if best_score > alpha:
             alpha = best_score
 
 
-    return random.choice(best_action_list)
+    return best_action
 
 # action + state to new state
 
