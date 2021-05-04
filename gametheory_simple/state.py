@@ -14,7 +14,7 @@ class State():
         self.enemy_list = []
         self.friendly_thrown = 0
         self.enemy_thrown = 0
-        self.history = collections.Counter()
+        
 
 def q_copy(state):
     new_state = State()

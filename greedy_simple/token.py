@@ -7,6 +7,14 @@ class Token:
 
 move_vector_list = [(0, -1), (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0)]
 
+# score state
+# calculate hexagonal Manhattan Distance
+def dist_to(friednly, enemy):
+    (r_o, q_o) = friednly.cord
+    (r_e, q_e) = enemy.cord
+    return max(abs(r_e - r_o), abs(q_e - q_o), abs(q_o - q_e + r_o - r_e))
+
+
 # check whether can eliminate enemy token
 def can_defeat(friendly, enemy):
     our = friendly.symbol

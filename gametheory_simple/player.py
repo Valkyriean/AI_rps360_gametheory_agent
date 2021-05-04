@@ -10,7 +10,6 @@ class Player:
         self.state = State()
         self.player = player
         self.timer = Timer()
-
     def action(self):
 
         # if self.state.friendly_thrown < 9:
@@ -31,6 +30,7 @@ class Player:
         start = time.process_time()
         update_state(player_action, self.state, True)
         update_state(opponent_action, self.state, False)
+        check_duplicated_state(self.state)
         settle(self.state)
         self.timer.update += (time.process_time() - start)
         self.timer.prt()

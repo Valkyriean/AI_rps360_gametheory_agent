@@ -1,6 +1,9 @@
 from greedy_simple.token import *
-
+import collections
+global history
+history = collections.Counter()
 def update_state(action_tuple, state, friendly):
+    global history
     action = action_tuple[0]
     if (action == "THROW"):
         symbol  = action_tuple[1]
@@ -9,11 +12,12 @@ def update_state(action_tuple, state, friendly):
             token = Token(symbol,cord)
             state.friendly_list.append(token)
             state.friendly_thrown += 1
-            state.history.clear()
+            history.clear()
         else:
             enemy = Token(symbol,cord)
             state.enemy_list.append(enemy)
             state.enemy_thrown += 1
+            history.clear()
     else:
         cord = action_tuple[1]
         if friendly:
@@ -111,12 +115,13 @@ def action_list(state, isFriendlyTurn):
 #             if action.token != friendly and action.tar == friendly.cord and can_defeat(action.token,friendly) != 0:
 #                 action_list.remove(action)
 def check_duplicated_state(state):
+    global history
     temp = []
     for i in state.friendly_list:
         temp.append((i.cord, i.symbol))
     temp.append(state.friendly_thrown)
-    state.history[tuple(temp)] += 1
-    if state.history[tuple(temp)] >= 3:
+    history[tuple(temp)] += 1
+    if history[tuple(temp)] >= 3:
         return False
     return True
 

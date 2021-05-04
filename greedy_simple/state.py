@@ -1,5 +1,5 @@
 from greedy_simple.action import *
-from greedy_simple.evaluation import *
+
 import random
 import copy
 import collections
@@ -8,12 +8,13 @@ MAX_THOROWN = 8
 
 
 class State():
+    player = ""
     def __init__(self):
         self.friendly_list = []
         self.enemy_list = []
         self.friendly_thrown = 0
         self.enemy_thrown = 0
-        self.history = collections.Counter()
+        
     
 def q_copy(state):
     new_state = State()
@@ -38,15 +39,17 @@ def simple_eval_state(state):
 def best_action(state):
     best_score = -9999
     best_action_list = []
-    for action in action_list(state):
+    for action in action_list(state, True):
         #print(str(state.score) + " "+str(action.action)+" " + str(action.token.symbol))
         new_state = q_copy(state)
-        # TODO
+        update_state(action.to_tuple(), state, True)
+        settle(new_state)
+        score = simple_eval_state(new_state)
 
-        if state.score > best_score:
+        if score > best_score:
             best_action_list = [action]
-            best_score = state.score
-        elif state.score == best_score:
+            best_score = score
+        elif score == best_score:
             best_action_list.append(action)
     return random.choice(best_action_list)
 

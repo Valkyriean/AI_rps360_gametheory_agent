@@ -1,6 +1,8 @@
 from gametheory_simple.token import *
+import collections
 
-
+global history
+history = collections.Counter()
 class Action:
     def __init__(self, token, tar):
         self.tar = tar
@@ -38,6 +40,7 @@ class Slide(Action):
 
 def update_state(action_tuple, state, friendly):
     action = action_tuple[0]
+    global history
     if (action == "THROW"):
         symbol  = action_tuple[1]
         cord = action_tuple[2]
@@ -45,12 +48,12 @@ def update_state(action_tuple, state, friendly):
             token = Token(symbol,cord)
             state.friendly_list.append(token)
             state.friendly_thrown += 1
-            state.history.clear()
+            history.clear()
         else:
             enemy = Token(symbol,cord)
             state.enemy_list.append(enemy)
             state.enemy_thrown += 1
-            state.history.clear()
+            history.clear()
     else:
         cord = action_tuple[1]
         if friendly:
@@ -143,12 +146,13 @@ def action_list(state, isFriendlyTurn):
     return action_list
 
 def check_duplicated_state(state):
+    global history
     temp = []
     for i in state.friendly_list:
         temp.append((i.cord, i.symbol))
     temp.append(state.friendly_thrown)
-    state.history[tuple(temp)] += 1
-    if state.history[tuple(temp)] >= 3:
+    history[tuple(temp)] += 1
+    if history[tuple(temp)] >= 3:
         return False
     return True
 
