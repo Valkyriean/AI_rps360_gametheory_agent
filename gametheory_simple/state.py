@@ -3,7 +3,7 @@ from gametheory import *
 import random
 import copy
 import time
-
+import collections
 MAX_THOROWN = 8
 MAX_DEPTH = 8
 
@@ -14,6 +14,7 @@ class State():
         self.enemy_list = []
         self.friendly_thrown = 0
         self.enemy_thrown = 0
+        self.history = collections.Counter()
 
 def q_copy(state):
     new_state = State()
@@ -76,6 +77,8 @@ def game_theory_simple(state, timer):
         
         start = time.process_time()
         update_state(friendly_action.to_tuple(), new_state1, True)
+        if not check_duplicated_state(new_state1):
+            continue
         timer.settle += time.process_time() - start
         for enemy_action in action_list(state, False):
             start = time.process_time()

@@ -45,10 +45,12 @@ def update_state(action_tuple, state, friendly):
             token = Token(symbol,cord)
             state.friendly_list.append(token)
             state.friendly_thrown += 1
+            state.history.clear()
         else:
             enemy = Token(symbol,cord)
             state.enemy_list.append(enemy)
             state.enemy_thrown += 1
+            state.history.clear()
     else:
         cord = action_tuple[1]
         if friendly:
@@ -140,5 +142,14 @@ def action_list(state, isFriendlyTurn):
         action_list += enemy_throw_list(state)
     return action_list
 
+def check_duplicated_state(state):
+    temp = []
+    for i in state.friendly_list:
+        temp.append((i.cord, i.symbol))
+    temp.append(state.friendly_thrown)
+    state.history[tuple(temp)] += 1
+    if state.history[tuple(temp)] >= 3:
+        return False
+    return True
 
 
