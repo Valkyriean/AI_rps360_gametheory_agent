@@ -42,7 +42,7 @@ def best_action(state):
     for action in action_list(state, True):
         #print(str(state.score) + " "+str(action.action)+" " + str(action.token.symbol))
         new_state = q_copy(state)
-        update_state(action.to_tuple(), state, True)
+        update_state(action.to_tuple(), new_state, True)
         settle(new_state)
         score = simple_eval_state(new_state)
 

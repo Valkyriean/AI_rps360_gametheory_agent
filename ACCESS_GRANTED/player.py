@@ -23,11 +23,11 @@ class Player:
         """
         # put your code here
         # list of all valid action
-        # if self.state.friendly_thrown < 9:
+        # if self.state.friendly_thrown < 3:
         #     return random_throw(self.state).to_tuple()
 
 
-        return simle_game_theory(self.state).to_tuple()
+        return simple_game_theory(self.state).to_tuple()
         # choose one
     
     def update(self, opponent_action, player_action):
@@ -41,5 +41,4 @@ class Player:
         # put your code here
         update_state(player_action, self.state, True)
         update_state(opponent_action, self.state, False)
-        
         settle(self.state)

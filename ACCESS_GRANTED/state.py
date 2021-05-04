@@ -127,7 +127,7 @@ def game_theory_matrix(state):
         v.append(row)
     return v
 
-def simle_game_theory(state):
+def simple_game_theory(state):
     new_state = copy.deepcopy(state)
     friendly_action = action_list(new_state, True)
     enemy_action = action_list(new_state, False)
