@@ -38,32 +38,92 @@ class Slide(Action):
         return (self.action, self.token.cord, self.tar)
         
 
-def update_state(action_tuple, state, friendly):
-    action = action_tuple[0]
+def sim_update_state(f_action_tuple, e_action_tuple, state):
+    fa = f_action_tuple[0]
+    ea = e_action_tuple[0]
+
     global history
-    if (action == "THROW"):
-        symbol  = action_tuple[1]
-        cord = action_tuple[2]
-        if friendly:
-            token = Token(symbol,cord)
-            state.friendly_list.append(token)
-            state.friendly_thrown += 1
-            history.clear()
-        else:
-            enemy = Token(symbol,cord)
-            state.enemy_list.append(enemy)
-            state.enemy_thrown += 1
-            history.clear()
+
+    if fa == "THROW":
+        symbol  = f_action_tuple[1]
+        cord = f_action_tuple[2]
+        ft = Token(symbol,cord)
+        state.friendly_list.append(ft)
+        state.friendly_thrown += 1
+        history.clear()
     else:
-        cord = action_tuple[1]
-        if friendly:
-            token_list = state.friendly_list
-        else:
-            token_list = state.enemy_list
-        for token in token_list:
-            if(token.cord == cord):
-                token.cord = action_tuple[2]
-                break
+        cord = f_action_tuple[1]
+        for token in state.friendly_list:
+            if token.cord == cord:
+                ft = token
+                ft.cord = f_action_tuple[2]
+    
+    if ea == "THROW":
+        symbol  = e_action_tuple[1]
+        cord = e_action_tuple[2]
+        et = Token(symbol,cord)
+        state.enemy_list.append(et)
+        state.enemy_thrown += 1
+        history.clear()
+    else:
+        cord = e_action_tuple[1]
+        for token in state.enemy_list:
+            if token.cord == cord:
+                et = token
+                et.cord = e_action_tuple[2]
+
+    token_list = state.friendly_list + state.enemy_list
+    for token in token_list:
+        if ft.cord == token.cord:
+            deft = can_defeat(ft,token)
+            if deft is 1:                
+                if token in state.enemy_list:
+                    state.enemy_list.remove(token)
+                elif token in state.friendly_list:
+                    state.friendly_list.remove(token)
+            elif deft is -1:
+                if ft in state.friendly_list:
+                    state.friendly_list.remove(ft)
+        
+        if et.cord == token.cord:
+            deft = can_defeat(et,token)
+            if deft is 1:                
+                if token in state.enemy_list:
+                    state.enemy_list.remove(token)
+                elif token in state.friendly_list:
+                    state.friendly_list.remove(token)
+            elif deft is -1:
+                if et in state.enemy_list:
+                    state.enemy_list.remove(et)
+
+
+
+# def update_state(action_tuple, state, friendly):
+#     action = action_tuple[0]
+#     global history
+#     if (action == "THROW"):
+#         symbol  = action_tuple[1]
+#         cord = action_tuple[2]
+#         if friendly:
+#             token = Token(symbol,cord)
+#             state.friendly_list.append(token)
+#             state.friendly_thrown += 1
+#             history.clear()
+#         else:
+#             enemy = Token(symbol,cord)
+#             state.enemy_list.append(enemy)
+#             state.enemy_thrown += 1
+#             history.clear()
+#     else:
+#         cord = action_tuple[1]
+#         if friendly:
+#             token_list = state.friendly_list
+#         else:
+#             token_list = state.enemy_list
+#         for token in token_list:
+#             if(token.cord == cord):
+#                 token.cord = action_tuple[2]
+#                 break
 
 
 

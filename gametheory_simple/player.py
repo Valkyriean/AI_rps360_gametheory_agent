@@ -28,10 +28,12 @@ class Player:
 
     def update(self, opponent_action, player_action):
         start = time.process_time()
-        update_state(player_action, self.state, True)
-        update_state(opponent_action, self.state, False)
+        # update_state(player_action, self.state, True)
+        # update_state(opponent_action, self.state, False)
+
+        sim_update_state(player_action, opponent_action, self.state)
         check_duplicated_state(self.state)
-        settle(self.state)
+        # settle(self.state)
         self.timer.update += (time.process_time() - start)
         self.timer.prt()
 

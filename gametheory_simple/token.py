@@ -58,15 +58,15 @@ def remove_out_bound(potential_move_list):
     return potential_move_list
 
 
-def settle(state):
-    token_list = state.friendly_list.copy() + state.enemy_list.copy()
-    for token1 in token_list:
-        for token2 in token_list:
-            if token1.cord == token2.cord and can_defeat(token1,token2) == 1:
-                if token2 in state.enemy_list:
-                    state.enemy_list.remove(token2)
-                elif token2 in state.friendly_list:
-                    state.friendly_list.remove(token2)
+# def settle(state):
+#     token_list = state.friendly_list.copy() + state.enemy_list.copy()
+#     for token1 in token_list:
+#         for token2 in token_list:
+#             if token1.cord == token2.cord and can_defeat(token1,token2) == 1:
+#                 if token2 in state.enemy_list:
+#                     state.enemy_list.remove(token2)
+#                 elif token2 in state.friendly_list:
+#                     state.friendly_list.remove(token2)
 
 # calculate hexagonal Manhattan Distance
 def dist_to(friednly, enemy):
