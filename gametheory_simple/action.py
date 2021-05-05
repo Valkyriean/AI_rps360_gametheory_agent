@@ -1,8 +1,13 @@
 from gametheory_simple.token import *
 import collections
+import time
 
 global history
 history = collections.Counter()
+
+global update_time
+update_time = 0
+
 class Action:
     def __init__(self, token, tar):
         self.tar = tar
@@ -38,7 +43,19 @@ class Slide(Action):
         return (self.action, self.token.cord, self.tar)
         
 
+def print_update_time():
+    global update_time
+    print("Action time is: " + str(update_time))
+
+def print_list_time():
+    global list_time
+    print("Listing time is: " + str(list_time))
+
+
 def sim_update_state(f_action_tuple, e_action_tuple, state):
+    global update_time
+    start = time.process_time()
+
     fa = f_action_tuple[0]
     ea = e_action_tuple[0]
 
@@ -57,6 +74,7 @@ def sim_update_state(f_action_tuple, e_action_tuple, state):
             if token.cord == cord:
                 ft = token
                 ft.cord = f_action_tuple[2]
+                break
     
     if ea == "THROW":
         symbol  = e_action_tuple[1]
@@ -71,6 +89,7 @@ def sim_update_state(f_action_tuple, e_action_tuple, state):
             if token.cord == cord:
                 et = token
                 et.cord = e_action_tuple[2]
+                break
 
     token_list = state.friendly_list + state.enemy_list
     for token in token_list:
@@ -95,6 +114,7 @@ def sim_update_state(f_action_tuple, e_action_tuple, state):
             elif deft is -1:
                 if et in state.enemy_list:
                     state.enemy_list.remove(et)
+    update_time += (time.process_time() - start)
 
 
 
@@ -191,8 +211,13 @@ def enemy_swing_list(state):
             swing_list.append(Swing(enemy, potential_swing_move))
     return swing_list
 
+global list_time
+list_time = 0
 
 def action_list(state, isFriendlyTurn):
+    global list_time
+    start = time.process_time()
+
     action_list = []
     if isFriendlyTurn:
         action_list += swing_list(state)
@@ -203,6 +228,7 @@ def action_list(state, isFriendlyTurn):
         action_list += enemy_swing_list(state)
         action_list += enemy_slide_list(state)
         action_list += enemy_throw_list(state)
+    list_time += (time.process_time() - start)
     return action_list
 
 def check_duplicated_state(state):

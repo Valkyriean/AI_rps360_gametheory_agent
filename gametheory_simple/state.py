@@ -16,24 +16,14 @@ class State():
         self.enemy_thrown = 0
 
 
-class Timer:
-    def __init__(self):
-        self.settle = 0
-        self.copy = 0
-        self.action = 0
-        self.update = 0
-
-    def prt(self):
-        print("action: " + str(self.action))
-        print("update: " + str(self.update))
-        print("settle: " + str(self.settle))
-        print("copy: " + str(self.copy))
-
-global timer
-timer = Timer()
+global copy_time
+copy_time = 0
       
+def print_copy_time():
+    print("copy time is :" + str(copy_time))
 
 def q_copy(state):
+    start = time.process_time()
     new_state = State()
     new_state.friendly_thrown = state.friendly_thrown
     new_state.enemy_thrown = state.enemy_thrown
@@ -42,6 +32,8 @@ def q_copy(state):
     
     for enemy in state.enemy_list:
         new_state.enemy_list.append(Token(enemy.symbol,enemy.cord))
+    global copy_time 
+    copy_time += (time.process_time() - start)
     return new_state
 
 
@@ -83,8 +75,8 @@ def random_throw(state):
 
 
 def game_theory_simple(state):
-    global timer
-    start = time.process_time()
+    # global timer
+    # start = time.process_time()
     matrix = []
     # time_taken = 0
     friendly_action_list = action_list(state, True)
@@ -102,9 +94,9 @@ def game_theory_simple(state):
         #     continue
         # timer.settle += time.process_time() - start
         for enemy_action in enemy_action_list:
-            start1 = time.process_time()
+            # start1 = time.process_time()
             new_state2 = q_copy(state)
-            timer.copy += time.process_time() - start1
+            # timer.copy += time.process_time() - start1
             sim_update_state(friendly_action.to_tuple(), enemy_action.to_tuple(), new_state2)
             
             # start = time.process_time()
@@ -141,8 +133,8 @@ def game_theory_simple(state):
             best_action_list.append(friendly_action_list[i])
         i+=1
     # print(time_taken)
-    timer.action += time.process_time() - start
-    timer.prt()
+    # timer.action += time.process_time() - start
+    # timer.prt()
     return random.choice(best_action_list)
 
 

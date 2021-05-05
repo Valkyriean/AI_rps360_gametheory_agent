@@ -74,39 +74,3 @@ def dist_to(friednly, enemy):
     (r_e, q_e) = enemy.cord
     return max(abs(r_e - r_o), abs(q_e - q_o), abs(q_o - q_e + r_o - r_e))
 
-'''
-# remove the movement will be defeated by lower token
-def remove_enemy_kill(friently, potential_move_list, game):
-    for enemy in game.enemy_list:
-        hit_enemy = enemy.cord in potential_move_list
-        killed_by_enemy = can_defeat(friently, enemy) == -1
-        if enemy.active and hit_enemy and killed_by_enemy:
-            potential_move_list.remove(enemy.cord)
-    return potential_move_list
-
-# remove thr movement will defeat another upper token
-def remove_friendly_fire(potential_move_list, game):
-    for friendly in game.friendly_list:
-        if friendly.cord in self.potential_move_list:
-            if self.can_defeat(friendly) != 0:
-                self.potential_move_list.remove(cord)
-
-    # filter the possible movement
-def potential_move(cord, game):
-    potential_move_list = []
-    # add slide
-    potential_move_list += potential_slide(cord)
-    # add swing
-    potential_move_list += potential_swing(cord, game)
-    # remove repetition
-    potential_move_list = list(set(potential_move_list))
-    if cord in potential_move_list:
-        potential_move_list.remove(cord)
-    # remove out of bound
-    potential_move_list = remove_out_bound(potential_move_list)
-    # remove killed by enemy
-    potential_move_list = remove_enemy_kill(game)
-     # remove killed by friendly
-    potential_move_list = remove_friendly_fire(game)
-
-'''
