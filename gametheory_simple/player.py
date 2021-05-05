@@ -9,25 +9,26 @@ class Player:
         State.player = player
         self.state = State()
         self.player = player
-        self.timer = Timer()
+        self.time_spent = 0
     def action(self):
+        start = time.process_time()
 
         # if self.state.friendly_thrown < 9:
         #     return random_throw(self.state).to_tuple()
-        # start = time.process_time()
 
         if self.state.friendly_thrown < 3:
-            ret = random_throw(self.state)
-            # self.timer.action += (time.process_time() - start)
-            return ret
-        ret = game_theory_simple(self.state).to_tuple()
-
-        
-        return ret
+            action = random_throw(self.state)
+        else:
+            if self.time_spent < 55:
+                action = game_theory_simple(self.state).to_tuple()
+            else:
+                action = greedy(self.state).to_tuple()
+        self.time_spent += (time.process_time() - start)
+        return action
 
 
     def update(self, opponent_action, player_action):
-        start = time.process_time()
+        # start = time.process_time()
         # update_state(player_action, self.state, True)
         # update_state(opponent_action, self.state, False)
 

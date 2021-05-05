@@ -98,32 +98,32 @@ def sim_update_state(f_action_tuple, e_action_tuple, state):
 
 
 
-# def update_state(action_tuple, state, friendly):
-#     action = action_tuple[0]
-#     global history
-#     if (action == "THROW"):
-#         symbol  = action_tuple[1]
-#         cord = action_tuple[2]
-#         if friendly:
-#             token = Token(symbol,cord)
-#             state.friendly_list.append(token)
-#             state.friendly_thrown += 1
-#             history.clear()
-#         else:
-#             enemy = Token(symbol,cord)
-#             state.enemy_list.append(enemy)
-#             state.enemy_thrown += 1
-#             history.clear()
-#     else:
-#         cord = action_tuple[1]
-#         if friendly:
-#             token_list = state.friendly_list
-#         else:
-#             token_list = state.enemy_list
-#         for token in token_list:
-#             if(token.cord == cord):
-#                 token.cord = action_tuple[2]
-#                 break
+def update_state(action_tuple, state, friendly):
+    action = action_tuple[0]
+    global history
+    if (action == "THROW"):
+        symbol  = action_tuple[1]
+        cord = action_tuple[2]
+        if friendly:
+            token = Token(symbol,cord)
+            state.friendly_list.append(token)
+            state.friendly_thrown += 1
+            history.clear()
+        else:
+            enemy = Token(symbol,cord)
+            state.enemy_list.append(enemy)
+            state.enemy_thrown += 1
+            history.clear()
+    else:
+        cord = action_tuple[1]
+        if friendly:
+            token_list = state.friendly_list
+        else:
+            token_list = state.enemy_list
+        for token in token_list:
+            if(token.cord == cord):
+                token.cord = action_tuple[2]
+                break
 
 
 

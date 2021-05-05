@@ -144,3 +144,20 @@ def game_theory_simple(state):
     timer.action += time.process_time() - start
     timer.prt()
     return random.choice(best_action_list)
+
+
+def greedy(state):
+    best_score = -9999
+    best_action_list = []
+    for action in action_list(state, True):
+        new_state = q_copy(state)
+        update_state(action.to_tuple(), new_state, True)
+        settle(new_state)
+        score = simple_eval_state(new_state)
+
+        if score > best_score:
+            best_action_list = [action]
+            best_score = score
+        elif score == best_score:
+            best_action_list.append(action)
+    return random.choice(best_action_list)
