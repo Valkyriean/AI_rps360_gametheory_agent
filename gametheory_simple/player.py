@@ -14,15 +14,15 @@ class Player:
 
         # if self.state.friendly_thrown < 9:
         #     return random_throw(self.state).to_tuple()
-        start = time.process_time()
+        # start = time.process_time()
 
         if self.state.friendly_thrown < 3:
             ret = random_throw(self.state)
-            self.timer.action += (time.process_time() - start)
+            # self.timer.action += (time.process_time() - start)
             return ret
-        ret = game_theory_simple(self.state, self.timer).to_tuple()
+        ret = game_theory_simple(self.state).to_tuple()
 
-        self.timer.action += (time.process_time() - start)
+        
         return ret
 
 
@@ -32,20 +32,20 @@ class Player:
         # update_state(opponent_action, self.state, False)
 
         sim_update_state(player_action, opponent_action, self.state)
-        check_duplicated_state(self.state)
+        # check_duplicated_state(self.state)
         # settle(self.state)
-        self.timer.update += (time.process_time() - start)
-        self.timer.prt()
+        # self.timer.update += (time.process_time() - start)
+        # self.timer.prt()
 
-class Timer:
-    def __init__(self):
-        self.settle = 0
-        self.copy = 0
-        self.action = 0
-        self.update = 0
+# class Timer:
+#     def __init__(self):
+#         self.settle = 0
+#         self.copy = 0
+#         self.action = 0
+#         self.update = 0
 
-    def prt(self):
-        print("action: " + str(self.action))
-        print("update: " + str(self.update))
-        print("settle: " + str(self.settle))
-        print("copy: " + str(self.copy))
+#     def prt(self):
+#         print("action: " + str(self.action))
+#         print("update: " + str(self.update))
+#         print("settle: " + str(self.settle))
+#         print("copy: " + str(self.copy))

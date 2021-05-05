@@ -14,7 +14,24 @@ class State():
         self.enemy_list = []
         self.friendly_thrown = 0
         self.enemy_thrown = 0
-        
+
+
+class Timer:
+    def __init__(self):
+        self.settle = 0
+        self.copy = 0
+        self.action = 0
+        self.update = 0
+
+    def prt(self):
+        print("action: " + str(self.action))
+        print("update: " + str(self.update))
+        print("settle: " + str(self.settle))
+        print("copy: " + str(self.copy))
+
+global timer
+timer = Timer()
+      
 
 def q_copy(state):
     new_state = State()
@@ -65,9 +82,11 @@ def random_throw(state):
 
 
 
-def game_theory_simple(state, timer):
+def game_theory_simple(state):
+    global timer
+    start = time.process_time()
     matrix = []
-    time_taken = 0
+    # time_taken = 0
     friendly_action_list = action_list(state, True)
     enemy_action_list = action_list(state, False)
     if len(friendly_action_list) is 0 or len(enemy_action_list) is 0:
@@ -77,17 +96,15 @@ def game_theory_simple(state, timer):
         # start = time.process_time()
         # new_state1 = q_copy(state)
         # timer.copy += time.process_time() - start
-        
         # start = time.process_time()
-        # update_state(friendly_action.to_tuple(), new_state1, True)
-        # if not check_duplicated_state(new_state1):
+        # update_state(friendly_action.to_tuple(), new_state2, True)
+        # if not check_duplicated_state(new_state2):
         #     continue
         # timer.settle += time.process_time() - start
         for enemy_action in enemy_action_list:
-            start = time.process_time()
+            start1 = time.process_time()
             new_state2 = q_copy(state)
-            timer.copy += time.process_time() - start
-           
+            timer.copy += time.process_time() - start1
             sim_update_state(friendly_action.to_tuple(), enemy_action.to_tuple(), new_state2)
             
             # start = time.process_time()
@@ -123,5 +140,7 @@ def game_theory_simple(state, timer):
         elif score == best_score:
             best_action_list.append(friendly_action_list[i])
         i+=1
-    print(time_taken)
+    # print(time_taken)
+    timer.action += time.process_time() - start
+    timer.prt()
     return random.choice(best_action_list)
