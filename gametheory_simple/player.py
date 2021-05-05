@@ -29,8 +29,8 @@ class Player:
     def update(self, opponent_action, player_action):
 
 
-        sim_update_state(player_action, opponent_action, self.state)
-
+        sim_update_state(player_action, opponent_action, self.state, True)
+        check_duplicated_state(self.state, True)
         print_copy_time()
         print_update_time()
         print_list_time()
