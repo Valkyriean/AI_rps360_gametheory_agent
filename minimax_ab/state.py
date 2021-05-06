@@ -25,12 +25,30 @@ def q_copy(state):
         new_state.enemy_list.append(Token(enemy.symbol,enemy.cord))
     return new_state
 
-
-
 def simple_eval_state(state):
     friendly = (8-state.friendly_thrown) + len(state.friendly_list)
     enemy = (8-state.enemy_thrown) + len(state.enemy_list)
     return friendly - enemy
+
+def dist_to_enemy(token, enemy_list):
+    min_dist = 999
+    for enemy in enemy_list:
+        if can_defeat(token, enemy) == 1:
+            dist = dist_to(token,enemy)
+            if dist < min_dist:
+                min_dist = dist
+    return min_dist
+
+def complex_eval_state(state):
+    friendly = (8-state.friendly_thrown)*1.05 + len(state.friendly_list)
+    enemy = (8-state.enemy_thrown)*1.05 + len(state.enemy_list)
+    base = (friendly - enemy)*100
+    for friendly in state.friendly_list:
+        dist = dist_to_enemy(friendly, state.enemy_list)
+        if dist != 999 and 8-dist > 0:
+            base += (8 - dist)
+    return base
+
 
 
 def best_action(state):

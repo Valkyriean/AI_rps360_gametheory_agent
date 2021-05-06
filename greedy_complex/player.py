@@ -12,26 +12,17 @@ class Player:
         as Lower).
         """
         # put your code here
-
+        State.player = player
         self.state = State()
         self.player = player
+
 
     def action(self):
         """
         Called at the beginning of each turn. Based on the current state
         of the game, select an action to play this turn.
         """
-        # put your code here
-        action_list = []
-        action_list += throw_list(self.state, self.player)
-        action_list += slide_list(self.state)
-        action_list += swing_list(self.state)
-        remove_friendly_fire(self.state, action_list)
-        state_list = actions_to_states(self.state, action_list)
-
-
-        # list of all valid action
-        return best_action(state_list).to_tuple()
+        return best_action(self.state).to_tuple()
         # choose one
     
     def update(self, opponent_action, player_action):
@@ -45,5 +36,5 @@ class Player:
         # put your code here
         update_state(player_action, self.state, True)
         update_state(opponent_action, self.state, False)
-        
+        check_duplicated_state(self.state)
         settle(self.state)

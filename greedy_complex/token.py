@@ -2,13 +2,18 @@ class Token:
     def __init__(self, symbol, cord):
         self.symbol = symbol
         self.cord = cord
-
-    # def copy(self):
-    #     new_token = Token(self.symbol, self.cord)
-    #     return new_token
-
+    def __lt__(self, other):
+        return self.cord < other.cord
 
 move_vector_list = [(0, -1), (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0)]
+
+# score state
+# calculate hexagonal Manhattan Distance
+def dist_to(friednly, enemy):
+    (r_o, q_o) = friednly.cord
+    (r_e, q_e) = enemy.cord
+    return max(abs(r_e - r_o), abs(q_e - q_o), abs(q_o - q_e + r_o - r_e))
+
 
 # check whether can eliminate enemy token
 def can_defeat(friendly, enemy):
