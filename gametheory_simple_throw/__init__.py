@@ -1,0 +1,1 @@
+from gametheory_simple.player import Player
