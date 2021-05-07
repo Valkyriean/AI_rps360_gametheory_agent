@@ -37,26 +37,32 @@ def q_copy(state):
     return new_state
 
 
-def dist_to_enemy(token, enemy_list):
-    min_dist = 999
-    for enemy in enemy_list:
-        if can_defeat(token, enemy) == 1:
-            dist = dist_to(token,enemy)
-            if dist < min_dist:
-                min_dist = dist
-    return min_dist
-
 
 def simple_eval_state(state):
     friendly = (8-state.friendly_thrown)*1.08 + len(state.friendly_list)
     enemy = (8-state.enemy_thrown)*1.08 + len(state.enemy_list)
     base = (friendly - enemy)*100
-    # for friendly in state.friendly_list:
-    #     dist = dist_to_enemy(friendly, state.enemy_list)
-    #     if dist != 999:
-    #         base += (8 - dist)
     return base
 
+def dist_to_friendly(token, friendly_list):
+    min_dist = 999
+    for friendly in friendly_list:
+        if can_defeat(token, friendly) == -1:
+            dist = dist_to(token,friendly)
+            if dist < min_dist:
+                min_dist = dist
+    return min_dist
+
+def complex_eval_state(state):
+    friendly = (8-state.friendly_thrown)*1.01 + len(state.friendly_list)
+    enemy = (8-state.enemy_thrown)*1.01 + len(state.enemy_list)
+    base = (friendly - enemy)*100
+    for enemy in state.enemy_list:
+        dist = dist_to_friendly(enemy, state.friendly_list)
+        # print(dist)
+        if dist != 999 and (10 - dist) > 0:
+            base += (10 - dist)
+    return base
 
 def random_throw(state):
     thrown_count = state.friendly_thrown
@@ -75,10 +81,8 @@ def random_throw(state):
 
 
 def game_theory_simple(state):
-    # global timer
-    # start = time.process_time()
+
     matrix = []
-    # time_taken = 0
     friendly_action_list = action_list(state, True)
     enemy_action_list = action_list(state, False)
     if len(friendly_action_list) is 0 or len(enemy_action_list) is 0:
@@ -86,26 +90,18 @@ def game_theory_simple(state):
     duplicate = []
     for friendly_action in friendly_action_list:
         row = []
-        # start = time.process_time()
         # new_state1 = q_copy(state)
-        # timer.copy += time.process_time() - start
-        # start = time.process_time()
         # update_state(friendly_action.to_tuple(), new_state2, True)
         # if not check_duplicated_state(new_state2):
         #     continue
-        # timer.settle += time.process_time() - start
         for enemy_action in enemy_action_list:
-            # start1 = time.process_time()
             new_state2 = q_copy(state)
-            # timer.copy += time.process_time() - start1
             sim_update_state(friendly_action.to_tuple(), enemy_action.to_tuple(), new_state2, False)
             if not check_duplicated_state(new_state2, False):
                 row = []
                 duplicate.append(friendly_action)
                 break
-            # start = time.process_time()
             # settle(new_state2)
-            # timer.settle += time.process_time() - start
 
             # fal2 = action_list(new_state2,True)
             # eal2 = action_list(new_state2, False)
@@ -126,29 +122,32 @@ def game_theory_simple(state):
         if len(row) != 0:
             matrix.append(row)
     s,v = solve_game(matrix)
+    for action in duplicate:
+        friendly_action_list.remove(action)
+
+    return random.choices(friendly_action_list, weights = s,k = 1)[0]
+    # best_score = -9999
+    # best_action_list = []
+    # i = 0
+    # # if len(duplicate) != 0:
+    #     # print(duplicate[0])
+    # for score in s:
+    #     if friendly_action_list[i] not in duplicate:
+    #         if score > best_score :
+    #             best_action_list = [friendly_action_list[i]]
+    #             # print(friendly_action_list[i])
+    #             best_score = score
+    #         elif score == best_score :
+    #             best_action_list.append(friendly_action_list[i])
+    #             # print(friendly_action_list[i])
+    #     i+=1
     
-    best_score = -9999
-    best_action_list = []
-    i = 0
-    # if len(duplicate) != 0:
-        # print(duplicate[0])
-    for score in s:
-        if friendly_action_list[i] not in duplicate:
-            if score > best_score :
-                best_action_list = [friendly_action_list[i]]
-                # print(friendly_action_list[i])
-                best_score = score
-            elif score == best_score :
-                best_action_list.append(friendly_action_list[i])
-                # print(friendly_action_list[i])
-        i+=1
-    
-    if len(best_action_list) == 0:
-        random.choice(friendly_action_list)
-    # print(time_taken)
-    # timer.action += time.process_time() - start
-    # timer.prt()
-    return random.choice(best_action_list)
+    # if len(best_action_list) == 0:
+    #     random.choice(friendly_action_list)
+    # # print(time_taken)
+    # # timer.action += time.process_time() - start
+    # # timer.prt()
+    # return random.choice(best_action_list)
 
 
 def greedy(state):

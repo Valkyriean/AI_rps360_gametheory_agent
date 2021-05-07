@@ -48,6 +48,26 @@ def simple_eval_state(state):
     return base
 
 
+def dist_to_friendly(token, friendly_list):
+    min_dist = 999
+    for friendly in friendly_list:
+        if can_defeat(token, friendly) == -1:
+            dist = dist_to(token,friendly)
+            if dist < min_dist:
+                min_dist = dist
+    return min_dist
+
+def complex_eval_state(state):
+    friendly = (8-state.friendly_thrown)*1.01 + len(state.friendly_list)
+    enemy = (8-state.enemy_thrown)*1.01 + len(state.enemy_list)
+    base = (friendly - enemy)*100
+    for enemy in state.enemy_list:
+        dist = dist_to_friendly(enemy, state.friendly_list)
+        # print(dist)
+        if dist != 999 and (10 - dist) > 0:
+            base += (10 - dist)
+    return base
+
 def random_throw(state):
     thrown_count = state.friendly_thrown
     throw_list = []
@@ -68,6 +88,7 @@ def game_theory_simple(state, timer):
     matrix = []
     time_taken = 0
     friendly_action_list = action_list(state, True)
+    enemy_action_list = action_list(state, False)
     for friendly_action in friendly_action_list:
         row = []
         start = time.process_time()
@@ -77,7 +98,7 @@ def game_theory_simple(state, timer):
         start = time.process_time()
         update_state(friendly_action.to_tuple(), new_state1, True)
         timer.settle += time.process_time() - start
-        for enemy_action in action_list(state, False):
+        for enemy_action in enemy_action_list:
             start = time.process_time()
             new_state2 = q_copy(new_state1)
             timer.copy += time.process_time() - start
@@ -87,7 +108,7 @@ def game_theory_simple(state, timer):
             start = time.process_time()
             settle(new_state2)
             timer.settle += time.process_time() - start
-            row.append(simple_eval_state(new_state2))
+            row.append(complex_eval_state(new_state2))
         matrix.append(row)
     s,v = solve_game(matrix)
     best_score = -9999
