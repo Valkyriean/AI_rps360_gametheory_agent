@@ -80,7 +80,7 @@ def random_throw(state):
 
 
 
-def game_theory_simple(state):
+def game_theory_simple(state, board):
 
     matrix = []
     friendly_action_list = action_list(state, True)
@@ -96,8 +96,9 @@ def game_theory_simple(state):
         #     continue
         for enemy_action in enemy_action_list:
             new_state2 = q_copy(state)
-            sim_update_state(friendly_action.to_tuple(), enemy_action.to_tuple(), new_state2, False)
-            if not check_duplicated_state(new_state2, False):
+            # new_board = copy.deepcopy(board)
+            sim_update_state(friendly_action.to_tuple(), enemy_action.to_tuple(), new_state2, False, board)
+            if not check_duplicated_state(new_state2,board, False):
                 row = []
                 duplicate.append(friendly_action)
                 break
@@ -118,7 +119,7 @@ def game_theory_simple(state):
             #         r2.append(simple_eval_state(new_state4))
             #     m2.append(r2)
             # s1, v1 = solve_game(m2)
-            row.append(simple_eval_state(new_state2))
+            row.append(complex_eval_state(new_state2))
         if len(row) != 0:
             matrix.append(row)
     s,v = solve_game(matrix)
@@ -150,16 +151,16 @@ def game_theory_simple(state):
     # return random.choice(best_action_list)
 
 
-def greedy(state):
+def greedy(state, board):
     best_score = -9999
     best_action_list = []
     for action in action_list(state, True):
         new_state = q_copy(state)
         update_state(action.to_tuple(), new_state, True)
         settle(new_state)
-        if not check_duplicated_state(new_state, False):
+        if not check_duplicated_state(new_state, board, False):
             continue
-        score = simple_eval_state(new_state)
+        score = complex_eval_state(new_state)
 
         if score > best_score:
             best_action_list = [action]
@@ -167,5 +168,5 @@ def greedy(state):
         elif score == best_score:
             best_action_list.append(action)
     if len(best_action_list) == 0:
-        random.choice(acton_list)
+        random.choice(acton_list(state, True))
     return random.choice(best_action_list)

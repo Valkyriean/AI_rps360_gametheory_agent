@@ -9,6 +9,7 @@ history = collections.Counter()
 global update_time
 update_time = 0
 
+
 class Action:
     def __init__(self, token, tar):
         self.tar = tar
@@ -20,7 +21,7 @@ class Throw(Action):
 
     def __init__(self, token):
         super().__init__(token, token.cord)
-        
+
     def to_tuple(self):
         return (self.action, self.token.symbol, self.tar)
 
@@ -30,110 +31,143 @@ class Swing(Action):
 
     def __init__(self, token, tar):
         super().__init__(token, tar)
-    
+
     def to_tuple(self):
         return (self.action, self.token.cord, self.tar)
 
+
 class Slide(Action):
     action = "SLIDE"
-    
+
     def __init__(self, token, tar):
         super().__init__(token, tar)
 
     def to_tuple(self):
         return (self.action, self.token.cord, self.tar)
-        
+
 
 def print_update_time():
     global update_time
     print("Action time is: " + str(update_time))
+
 
 def print_list_time():
     global list_time
     print("Listing time is: " + str(list_time))
 
 
-def sim_update_state(f_action_tuple, e_action_tuple, state, real):
+def sim_update_state(f_action_tuple, e_action_tuple, state, real, board):
     global update_time
     start = time.process_time()
-
+    change_dict = {'s': 0, 'r': 1, 'p': 2}
     fa = f_action_tuple[0]
     ea = e_action_tuple[0]
 
     global history
 
     if fa == "THROW":
-        symbol  = f_action_tuple[1]
+        symbol = f_action_tuple[1]
         cord = f_action_tuple[2]
-        ft = Token(symbol,cord)
+        ft = Token(symbol, cord)
         state.friendly_list.append(ft)
         state.friendly_thrown += 1
         if real:
-            history.clear()
+            if cord not in board.keys():
+                board[cord] = [(0, change_dict[symbol])]
+            else:
+                board[cord].append((0, change_dict[symbol]))
     else:
         cord = f_action_tuple[1]
         for token in state.friendly_list:
             if token.cord == cord:
                 ft = token
                 ft.cord = f_action_tuple[2]
+                # print(ft.cord)
+                # print(board[cord])
+                if real:
+                    board[cord].remove((0, change_dict[ft.symbol]))
+                    if ft.cord not in board.keys():
+                        board[ft.cord] = [(0, change_dict[ft.symbol])]
+                    else:
+                        board[ft.cord].append((0, change_dict[ft.symbol]))
                 break
-    
+
     if ea == "THROW":
-        symbol  = e_action_tuple[1]
+        symbol = e_action_tuple[1]
         cord = e_action_tuple[2]
-        et = Token(symbol,cord)
+        et = Token(symbol, cord)
         state.enemy_list.append(et)
         state.enemy_thrown += 1
         if real:
-            history.clear()
+            if cord not in board.keys():
+                board[cord] = [(1, change_dict[symbol])]
+            else:
+                board[cord].append((1, change_dict[symbol]))
     else:
         cord = e_action_tuple[1]
         for token in state.enemy_list:
             if token.cord == cord:
                 et = token
                 et.cord = e_action_tuple[2]
+                if real:
+                    board[cord].remove((1, change_dict[et.symbol]))
+                    if et.cord not in board.keys():
+                        board[et.cord] = [(1, change_dict[et.symbol])]
+                    else:
+                        board[et.cord].append((1, change_dict[et.symbol]))
                 break
 
     token_list = state.friendly_list + state.enemy_list
     for token in token_list:
         if ft.cord == token.cord:
-            deft = can_defeat(ft,token)
-            if deft is 1:                
+            deft = can_defeat(ft, token)
+            if deft is 1:
                 if token in state.enemy_list:
                     state.enemy_list.remove(token)
+                    if real:
+                        board[token.cord].remove((1, change_dict[token.symbol]))
                 elif token in state.friendly_list:
                     state.friendly_list.remove(token)
+                    if real:
+                        board[token.cord].remove((0, change_dict[token.symbol]))
             elif deft is -1:
                 if ft in state.friendly_list:
                     state.friendly_list.remove(ft)
-        
+                    if real:
+                        board[token.cord].remove((0, change_dict[ft.symbol]))
+
         if et.cord == token.cord:
-            deft = can_defeat(et,token)
-            if deft is 1:                
+            deft = can_defeat(et, token)
+            if deft is 1:
                 if token in state.enemy_list:
                     state.enemy_list.remove(token)
+                    if real:
+                        board[token.cord].remove((1, change_dict[token.symbol]))
                 elif token in state.friendly_list:
                     state.friendly_list.remove(token)
+                    if real:
+                        board[token.cord].remove((0, change_dict[token.symbol]))
             elif deft is -1:
                 if et in state.enemy_list:
                     state.enemy_list.remove(et)
+                    if real:
+                        board[token.cord].remove((1, change_dict[et.symbol]))
     update_time += (time.process_time() - start)
-
 
 
 def update_state(action_tuple, state, friendly):
     action = action_tuple[0]
     # global history
     if (action == "THROW"):
-        symbol  = action_tuple[1]
+        symbol = action_tuple[1]
         cord = action_tuple[2]
         if friendly:
-            token = Token(symbol,cord)
+            token = Token(symbol, cord)
             state.friendly_list.append(token)
             state.friendly_thrown += 1
             # history.clear()
         else:
-            enemy = Token(symbol,cord)
+            enemy = Token(symbol, cord)
             state.enemy_list.append(enemy)
             state.enemy_thrown += 1
             # history.clear()
@@ -149,37 +183,37 @@ def update_state(action_tuple, state, friendly):
                 break
 
 
-
 def throw_list(state):
     if state.friendly_thrown > 8:
         return []
     thrown_count = state.friendly_thrown
     throw_list = []
-    symbols = ['s','r','p']
+    symbols = ['s', 'r', 'p']
     p = -1
     if state.player == "upper":
         p = 1
     for r in range(4*p, (4-thrown_count)*p - p, -1*p):
-        pos = 1 if r>0 else -1
+        pos = 1 if r > 0 else -1
         for q in range(-1*pos*4, pos*4-r+pos, pos):
             for s in symbols:
-                throw_list.append(Throw(Token(s,(r,q))))
+                throw_list.append(Throw(Token(s, (r, q))))
     return throw_list
+
 
 def enemy_throw_list(state):
     if state.enemy_thrown > 8:
         return []
     thrown_count = state.enemy_thrown
     throw_list = []
-    symbols = ['s','r','p']
+    symbols = ['s', 'r', 'p']
     p = -1
     if state.player == "lower":
         p = 1
     for r in range(4*p, (4-thrown_count)*p - p, -1*p):
-        pos = 1 if r>0 else -1
+        pos = 1 if r > 0 else -1
         for q in range(-1*pos*4, pos*4-r+pos, pos):
             for s in symbols:
-                throw_list.append(Throw(Token(s,(r,q))))
+                throw_list.append(Throw(Token(s, (r, q))))
     return throw_list
 
 
@@ -190,6 +224,7 @@ def slide_list(state):
         for potential_slide_move in potential_slide_list:
             slide_list.append(Slide(friednly, potential_slide_move))
     return slide_list
+
 
 def enemy_slide_list(state):
     slide_list = []
@@ -202,10 +237,12 @@ def enemy_slide_list(state):
 def swing_list(state):
     swing_list = []
     for friednly in state.friendly_list:
-        potential_swing_list = potential_swing(friednly.cord, state.friendly_list)
+        potential_swing_list = potential_swing(
+            friednly.cord, state.friendly_list)
         for potential_swing_move in potential_swing_list:
             swing_list.append(Swing(friednly, potential_swing_move))
     return swing_list
+
 
 def enemy_swing_list(state):
     swing_list = []
@@ -214,8 +251,10 @@ def enemy_swing_list(state):
             swing_list.append(Swing(enemy, potential_swing_move))
     return swing_list
 
+
 global list_time
 list_time = 0
+
 
 def action_list(state, isFriendlyTurn):
     global list_time
@@ -248,8 +287,19 @@ def action_list(state, isFriendlyTurn):
 #     return True
 
 
-def check_duplicated_state(state, real):
+def check_duplicated_state(state, board, real):
     global history
+    # if real:
+    #     if state.friendly_thrown != board["f_throw"] or state.enemy_thrown != board["e_throw"]:
+    #         history.clear()
+    #         board["f_throw"] = state.friendly_thrown
+    #         board["e_throw"] = state.enemy_thrown
+    #     history[tuple(board)] += 1
+    #     # print(history.most_common(1))
+    # if history[tuple(board)] >= 2:
+    #     # print(history[curr])
+    #     return False
+    # return True
     curr = snap(state)
     if real:
         history[curr] +=1
