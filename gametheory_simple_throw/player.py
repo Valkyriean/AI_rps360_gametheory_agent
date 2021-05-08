@@ -21,7 +21,7 @@ class Player:
         # else:
         # action = game_theory_simple(self.state, self.upper)
         if self.time_spent < 55:
-            action = game_theory_simple(self.state, self.upper)
+            action = mini_max(self.state, self.upper)
         else:
             action = greedy(self.state, self.upper)
         self.time_spent += (time.process_time() - start)

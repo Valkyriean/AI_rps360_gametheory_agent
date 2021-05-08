@@ -13,13 +13,11 @@ settle_t = 0
 def settle(state, f_token, e_token):
     start = time.process_time()
     f_list = state[0].copy()
-    if e_token != None:
-        e_list = state[1].copy()
+    e_list = state[1].copy()
     lost = 0
     kill = 0
-
     for player_token in f_list:
-        if f_token[1] == player_token[1]:
+        if f_token != None and f_token[1] == player_token[1]:
             defeat = can_defeat(f_token[0], player_token[0])
             if defeat is 1 and player_token in state[0]:
                 state[0].remove(player_token)
@@ -37,7 +35,7 @@ def settle(state, f_token, e_token):
                 kill += 1       
 
     for opponent_token in e_list:
-        if f_token[1] == opponent_token[1]:
+        if f_token != None and f_token[1] == opponent_token[1]:
             defeat = can_defeat(f_token[0], opponent_token[0])
             if defeat is 1 and opponent_token in state[1]:
                 state[1].remove(opponent_token)
@@ -94,52 +92,52 @@ def simple_eval_state(state):
 
 
 def dist_to(friednly, enemy):
-    (r_o, q_o) = friednly.cord
-    (r_e, q_e) = enemy.cord
+    (r_o, q_o) = friednly
+    (r_e, q_e) = enemy
     return max(abs(r_e - r_o), abs(q_e - q_o), abs(q_o - q_e + r_o - r_e))
 
 
-# def dist_to_friendly(token, friendly_list):
-#     min_dist = 999
-#     for friendly in friendly_list:
-#         if can_defeat(token, friendly) == -1:
-#             dist = dist_to(token,friendly)
-#             if dist < min_dist:
-#                 min_dist = dist
-#     return min_dist
+def dist_to_friendly(token, friendly_list):
+    min_dist = 999
+    for friendly in friendly_list:
+        if can_defeat(token[0], friendly[0]) == -1:
+            dist = dist_to(token[1],friendly[1])
+            if dist < min_dist:
+                min_dist = dist
+    return min_dist
 
-# def complex_eval_state(state):
-#     friendly = (8-state.friendly_thrown)*1.01 + len(state.friendly_list)
-#     enemy = (8-state.enemy_thrown)*1.01 + len(state.enemy_list)
-#     base = (friendly - enemy*0.99)*100 + 1000
-#     for enemy in state.enemy_list:
-#         dist = dist_to_friendly(enemy, state.friendly_list)
-#         # print(dist)
-#         if dist != 999 and (10 - dist) > 0:
-#             base += (10 - dist)
-#     return base
+def complex_eval_state(state):
+    friendly = (8-state[2])*1.01 + len(state[0])
+    enemy = (8-state[3])*1.01 + len(state[1])
+    base = (friendly - enemy*0.99)*100
+    for enemy in state[1]:
+        dist = dist_to_friendly(enemy, state[0])
+        # print(dist)
+        if dist != 999 and (10 - dist) > 0:
+            base += (10 - dist)
+    return base
 
-# def random_throw(state):
-#     thrown_count = state.friendly_thrown
-#     throw_list = []
-#     symbols = ['s','r','p']
-#     p = -1
-#     if state.player == "upper":
-#         p = 1
-#     r = (4-thrown_count)*p
+def random_throw(state):
+    thrown_count = state.friendly_thrown
+    throw_list = []
+    symbols = ['s','r','p']
+    p = -1
+    if state.player == "upper":
+        p = 1
+    r = (4-thrown_count)*p
 
-#     pos = 1 if r>0 else -1
-#     q = random.choice(range(-1*pos*4, pos*4-r+pos, pos))
-#     return ("THROW", symbols[thrown_count%3], (r,q))
-
-
+    pos = 1 if r>0 else -1
+    q = random.choice(range(-1*pos*4, pos*4-r+pos, pos))
+    return ("THROW", symbols[thrown_count%3], (r,q))
 
 
-def game_theory_simple(state, upper):
+
+
+def game_theory(state, upper):
 
     matrix = []
     friendly_action_list = get_action_list(state, True, upper)
-    enemy_action_list = get_action_list(state, False, not upper)
+    enemy_action_list = get_action_list(state, False, upper)
     if len(friendly_action_list) is 0 or len(enemy_action_list) is 0:
         return
     duplicate = []
@@ -172,7 +170,7 @@ def game_theory_simple(state, upper):
             #         r2.append(simple_eval_state(new_state4))
             #     m2.append(r2)
             # s1, v1 = solve_game(m2)
-            row.append(simple_eval_state(new_state2))
+            row.append(complex_eval_state(new_state2))
         if len(row) != 0:
             matrix.append(row)
     # print(matrix)
@@ -188,10 +186,9 @@ def greedy(state, upper):
     best_action_list = []
     action_list = get_action_list(state, True, upper)
     for action in action_list:
-        new_state2 = state_copy(state)
-        update_state(new_state, action, True)
-        f_token = update_state(new_state2, friendly_action, True)
-        kill, lost = settle(new_state2, f_token, None)       
+        new_state = state_copy(state)
+        f_token = update_state(new_state, action, True)
+        kill, lost = settle(new_state, f_token, None)       
         if not check_duplicated_state(new_state, False):
             continue
         score = simple_eval_state(new_state)
@@ -204,3 +201,72 @@ def greedy(state, upper):
     if len(best_action_list) == 0:
         return random.choice(action_list)
     return random.choice(best_action_list)
+
+
+MAX_DEPTH = 4
+
+
+def mini_max(state, upper):
+    best_score = -9999
+    alpha = -9999
+    beta = 9999
+    best_action_list = []
+    best_action = None
+    action_list = get_action_list(state, True, upper)
+    for action in action_list:
+        new_state = state_copy(state)
+        f_t = update_state(new_state, action, True)
+        settle(new_state, f_t, None)
+        score = min_value(new_state, alpha, beta, 1, upper)
+        if score > best_score:
+            best_action_list = [action]
+            best_score = score
+        elif score == best_score:
+            best_action_list.append(action)
+        # if best_score >= beta:
+        #     return best_score
+        if best_score > alpha:
+            alpha = best_score
+    return random.choice(best_action_list)
+
+
+def max_value(state, alpha, beta, depth, upper):
+    if depth >= MAX_DEPTH:
+        return complex_eval_state(state)
+    max_score = -9999
+    bese_action = None
+    action_list = get_action_list(state, True, upper)
+    for action in action_list:
+        new_state = state_copy(state)
+        f_t = update_state(new_state, action, True)
+        settle(new_state, f_t, None)
+        score = min_value(new_state, alpha, beta, depth+1, upper)
+
+        if score > max_score:
+            max_score = score
+
+        if max_score >= beta:
+            return max_score
+        if max_score > alpha:
+            alpha = max_score
+    return max_score
+
+def min_value(state, alpha, beta, depth, upper):
+    if depth >= MAX_DEPTH:
+        return complex_eval_state(state)
+    min_score = 9999
+    action_list = get_action_list(state, False, upper)
+    for action in action_list:
+        new_state = state_copy(state)
+        e_t = update_state(new_state, action, False)
+        settle(new_state, None, e_t)
+        score = max_value(new_state, alpha, beta, depth+1, upper)
+
+        if score < min_score:
+            min_score = score
+        
+        if min_score<= alpha:
+            return min_score
+        if min_score < beta:
+            beta = min_score
+    return min_score

@@ -76,13 +76,16 @@ def get_action_list(state, friednly, upper):
     throw_cord_list = []
     throw_list = []
     swing_list = []
-    token_list = state[1]
-    opponent_list = state[0]
-    thrown = state[3]
-    if friednly:
-        token_list = state[0]
-        opponent_list = state[1]
-        thrown = state[2]
+    token_list = state[0]
+    opponent_list = state[1]
+    thrown = state[2]
+    
+    if not friednly:
+        token_list = state[1]
+        opponent_list = state[0]
+        thrown = state[3]
+        upper = not upper
+
 
     for token in token_list:
         surrounding_list = []
