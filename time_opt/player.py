@@ -6,14 +6,15 @@ import time
 
 class Player:
     def __init__(self, player):
-        State.player = player
-        self.state = State()
-        self.player = player
+        self.state = {}
+        self.throw = [0,0]
+        if player == 'upper':
+            self.player = 0
+        else:
+            self.player = 1
         self.time_spent = 0
     def action(self):
         start = time.process_time()
-
-
 
         # if self.state.friendly_thrown < 3:
         #     action = random_throw(self.state)

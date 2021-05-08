@@ -12,9 +12,7 @@ symbols = ['r','p','s']
 
 
 # check whether can eliminate enemy token
-def can_defeat(friendly, enemy):
-    our = friendly.symbol
-    tar = enemy.symbol
+def can_defeat(our, tar):
     if (our == "p" and tar == "r") or (our == 'r' and tar == 's') or (our == 's' and tar == 'p'):
         return 1
     elif our == tar:

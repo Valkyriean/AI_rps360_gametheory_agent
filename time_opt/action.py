@@ -3,6 +3,86 @@ import collections
 import time
 import copy
 
+
+
+
+def move(board, f_action, e_action, throw):
+    fa = f_action[0]
+    ea = e_action[0]
+    # change_dict = {'s': 0, 'r': 1, 'p': 2}
+    global history
+
+    if fa == "THROW":
+        symbol  = f_action_tuple[1]
+        f_tar = f_action_tuple[2]
+        if f_tar not in board.keys():
+            board[f_tar] = [(0, symbol)]
+        else:
+            board[f_tar].append((0, symbol))
+        throw[0] += 1
+        # ft = Token(symbol,cord)
+        # state.friendly_list.append(ft)
+        # state.friendly_thrown += 1
+        if real:
+            history.clear()
+    else:
+        cord = f_action_tuple[1]
+        f_tar = f_action_tuple[2]
+        token_list = board[cord]
+        for token in token_list:
+            if token[0] == 0:
+                board_rm(board, f_tar, token)
+                if f_tar not in board.keys():
+                    board[f_tar] = [token]
+                else:
+                    board[f_tar].append(token)
+                break
+            
+    if ea == "THROW":
+        symbol  = e_action[1]
+        e_tar = e_action[2]
+        if e_tar not in board.keys():
+            board[e_tar] = [(0, symbol)]
+        else:
+            board[e_tar].append((0, symbol))
+        throw[1] += 1
+        if real:
+            history.clear()
+    else:
+        cord = e_action_tuple[1]
+        e_tar = e_action_tuple[2]
+        token_list = board[cord]
+        for token in token_list:
+            if token[0] == 1:
+                board_rm(board, e_tar, token)
+                if e_tar not in board.keys():
+                    board[e_tar] = [token]
+                else:
+                    board[e_tar].append(token)
+                    
+                break
+
+
+
+def settle(board, tar):
+    token_list = board[tar]
+    if len(token_list) <= 1:
+        return 0
+    i = 0
+    j = len(token_list)
+    while(i <= j):
+        cur = token_list[i]
+        tar = token_list[j]
+        if can_defeat
+
+
+    
+def board_rm(board, cord, token):
+    board[cord].remove(token)
+    if len(board[cord]) == 0:
+        del board[cord]
+    
+
 global history
 history = collections.Counter()
 
@@ -248,20 +328,19 @@ def action_list(state, isFriendlyTurn):
 #     return True
 
 
-def check_duplicated_state(state, real):
+def check_duplicated_state(board, real):
     global history
-    curr = snap(state)
     if real:
-        history[curr] +=1
+        history[tuple(board)] +=1
         # print(history.most_common(1))
-    if history[curr] >= 2:
+    if history[tuple(board)] >= 2:
         # print(history[curr])
         return False
     return True
 
-def snap(state):
-    temp = []
-    for i in state.friendly_list:
-        temp.append((i.cord, i.symbol))
-    temp.append(state.friendly_thrown)
-    return tuple(temp)
+# def snap(state):
+#     temp = []
+#     for i in state.friendly_list:
+#         temp.append((i.cord, i.symbol))
+#     temp.append(state.friendly_thrown)
+#     return tuple(temp)

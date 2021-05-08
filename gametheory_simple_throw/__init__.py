@@ -1,1 +1,1 @@
-from gametheory_simple.player import Player
+from gametheory_simple_throw.player import Player
