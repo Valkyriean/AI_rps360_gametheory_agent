@@ -2,93 +2,250 @@ from ACCESS_GRANTED.action import *
 from gametheory import *
 import random
 import copy
-
+import time
+import collections
 MAX_THOROWN = 8
 MAX_DEPTH = 8
 
-class State():
-    player = None
-    def __init__(self):
-        self.friendly_list = []
-        self.enemy_list = []
-        self.friendly_thrown = 0
-        self.enemy_thrown = 0
-        self.score = -9999
-    
+global settle_t
+settle_t = 0
 
-# action list to state list
-def actions_to_states(state, action_list):
-    state_list = []
-    for action in action_list:
-        new_state = copy.deepcopy(state)
-        update_state(action.to_tuple(), new_state, True)
-        settle(new_state)
-        new_state.score = simple_eval_state(new_state)
-        state_list.append((new_state,action))
-    return state_list
+def settle(state, f_token, e_token):
+    start = time.process_time()
+    f_list = state[0].copy()
+    e_list = state[1].copy()
+    lost = 0
+    kill = 0
+    for player_token in f_list:
+        if f_token != None and f_token[1] == player_token[1]:
+            defeat = can_defeat(f_token[0], player_token[0])
+            if defeat is 1 and player_token in state[0]:
+                state[0].remove(player_token)
+                lost += 1
+            elif defeat is -1 and f_token in state[0]:
+                state[0].remove(f_token)
+                lost += 1                
+        if e_token != None and e_token[1] == player_token[1]:
+            defeat = can_defeat(e_token[0], player_token[0])
+            if defeat is 1 and player_token in state[0]:
+                state[0].remove(player_token)
+                lost += 1
+            elif defeat is -1 and e_token in state[1]:
+                state[1].remove(e_token)
+                kill += 1       
+
+    for opponent_token in e_list:
+        if f_token != None and f_token[1] == opponent_token[1]:
+            defeat = can_defeat(f_token[0], opponent_token[0])
+            if defeat is 1 and opponent_token in state[1]:
+                state[1].remove(opponent_token)
+                kill += 1
+            elif defeat is -1 and f_token in state[0]:
+                state[0].remove(f_token)
+                lost += 1                
+        if e_token != None and  e_token[1] == opponent_token[1]:
+            defeat = can_defeat(e_token[0], opponent_token[0])
+            if defeat is 1 and opponent_token in state[1]:
+                state[1].remove(opponent_token)
+                kill += 1
+            elif defeat is -1 and e_token in state[1]:
+                state[1].remove(e_token)
+                kill += 1   
+
+    global settle_t 
+    settle_t += (time.process_time() - start)
+    return kill, lost
+
+def print_settle_time():
+    global settle_t
+    print("Settle time is: " + str(settle_t))
+
+
+
+
+
+global copy_time
+copy_time = 0
+      
+def print_copy_time():
+    print("copy time is :" + str(copy_time))
+
+
+def state_copy(state):
+    start = time.process_time()
+    enemy_list = state[0].copy()
+    friendly_list = state[1].copy()
+    friendly_thrown = state[2]
+    enemy_thrown = state[3]
+    global copy_time
+    copy_time += (time.process_time() - start)
+    return [enemy_list,friendly_list, friendly_thrown, enemy_thrown]
+
+
+
 
 def simple_eval_state(state):
-    friendly = (8-state.friendly_thrown)*1.1 + len(state.friendly_list)
-    enemy = (8-state.enemy_thrown)*1.1 + len(state.enemy_list)
-    return friendly - enemy
+    friendly = (8-state[2])*1.08 + len(state[0])
+    enemy = (8-state[3])*1.08 + len(state[1])
+    base = (friendly - enemy)*100 + 1000
+    return base
 
 
-def best_action(state):
+def dist_to(friednly, enemy):
+    (r_o, q_o) = friednly
+    (r_e, q_e) = enemy
+    return max(abs(r_e - r_o), abs(q_e - q_o), abs(q_o - q_e + r_o - r_e))
+
+
+def dist_to_friendly(token, friendly_list):
+    min_dist = 999
+    for friendly in friendly_list:
+        if can_defeat(token[0], friendly[0]) == -1:
+            dist = dist_to(token[1],friendly[1])
+            if dist < min_dist:
+                min_dist = dist
+    return min_dist
+
+def complex_eval_state(state):
+    friendly = (8-state[2])*1.01 + len(state[0])
+    enemy = (8-state[3])*1.01 + len(state[1])
+    base = (friendly - enemy*0.99)*100
+    for enemy in state[1]:
+        dist = dist_to_friendly(enemy, state[0])
+        # print(dist)
+        if dist != 999 and (10 - dist) > 0:
+            base += (10 - dist)
+    return base
+
+def random_throw(state):
+    thrown_count = state.friendly_thrown
+    throw_list = []
+    symbols = ['s','r','p']
+    p = -1
+    if state.player == "upper":
+        p = 1
+    r = (4-thrown_count)*p
+
+    pos = 1 if r>0 else -1
+    q = random.choice(range(-1*pos*4, pos*4-r+pos, pos))
+    return ("THROW", symbols[thrown_count%3], (r,q))
+
+
+
+
+def game_theory(state, upper):
+
+    matrix = []
+    friendly_action_list = get_action_list(state, True, upper)
+    enemy_action_list = get_action_list(state, False, upper)
+    if len(friendly_action_list) is 0 or len(enemy_action_list) is 0:
+        return
+    duplicate = []
+    for friendly_action in friendly_action_list:
+        row = []
+        new_state1 = state_copy(state)
+        f_token = update_state(new_state1, friendly_action, True)
+        for enemy_action in enemy_action_list:
+            new_state2 = state_copy(new_state1)
+            e_token = update_state(new_state2, enemy_action, False)
+            kill, lost = settle(new_state2, f_token, e_token)
+
+            if not check_duplicated_state(new_state2, False):
+                row = []
+                duplicate.append(friendly_action)
+                break
+
+            # friendly_action_list2 = get_action_list(new_state2, True, upper)
+            # enemy_action_list2 = get_action_list(new_state2, False, not upper)
+            
+            # m2 = []
+            # for friendly_action2 in friendly_action_list2:
+            #     new_state3 = state_copy(new_state2)
+            #     f_token2 = update_state(new_state3, friendly_action2, True)
+            #     r2 = []
+            #     for enemy_action2 in enemy_action_list2:
+            #         new_state4 = state_copy(new_state3)
+            #         e_token2 = update_state(new_state4, enemy_action2, False)
+            #         kill, lost = settle(new_state4, f_token2, e_token2)
+            #         r2.append(simple_eval_state(new_state4))
+            #     m2.append(r2)
+            # s1, v1 = solve_game(m2)
+            row.append(complex_eval_state(new_state2))
+        if len(row) != 0:
+            matrix.append(row)
+    # print(matrix)
+    try:
+        s,v = solve_game(matrix)
+    except:
+        print("OptimisationError")
+        return greedy(state, upper)
+         
+    for action in duplicate:
+        friendly_action_list.remove(action)
+    # print(s)
+    return random.choices(friendly_action_list, weights = s,k = 1)[0]
+    
+
+def greedy(state, upper):
+    best_score = -9999
+    best_action_list = []
+    action_list = get_action_list(state, True, upper)
+    for action in action_list:
+        new_state = state_copy(state)
+        f_token = update_state(new_state, action, True)
+        kill, lost = settle(new_state, f_token, None)       
+        if not check_duplicated_state(new_state, False):
+            continue
+        score = simple_eval_state(new_state)
+
+        if score > best_score:
+            best_action_list = [action]
+            best_score = score
+        elif score == best_score:
+            best_action_list.append(action)
+    if len(best_action_list) == 0:
+        return random.choice(action_list)
+    return random.choice(best_action_list)
+
+
+MAX_DEPTH = 4
+
+
+def mini_max(state, upper):
     best_score = -9999
     alpha = -9999
     beta = 9999
     best_action_list = []
     best_action = None
-    for action in action_list(state,True):
-        new_state = copy.deepcopy(state)
-        update_state(action.to_tuple(), new_state, True)
-        settle(new_state)
-        score = min_value(state, alpha, beta, 1)
+    action_list = get_action_list(state, True, upper)
+    for action in action_list:
+        new_state = state_copy(state)
+        f_t = update_state(new_state, action, True)
+        settle(new_state, f_t, None)
+        score = min_value(new_state, alpha, beta, 1, upper)
         if score > best_score:
-            best_action = action
+            best_action_list = [action]
             best_score = score
-        # elif score == best_score:
-        #     best_action_list.append(action)
-        if best_score >= beta:
-            return best_score
+        elif score == best_score:
+            best_action_list.append(action)
+        # if best_score >= beta:
+        #     return best_score
         if best_score > alpha:
             alpha = best_score
+    return random.choice(best_action_list)
 
 
-    return best_action
-
-# action + state to new state
-
-
-
-
-
-def minimax(isMaxTurn,state, depth):
-    if depth >= MAX_DEPTH:          
-        return simple_eval_state(state)
-
-    scores = []
-    for action in action_list(state):
-        new_state = copy.deepcopy(state)
-        update_state(action.to_tuple(), new_state, isMaxTurn)
-        settle(new_state)
-        scores.append(minimax(not isMaxTurn, new_state, depth+1))
-    return max(scores) if isMaxTurn else min(scores)
-
-
-def random_throw(state):
-    return random.choice(throw_list(state))
-
-def max_value(state, alpha, beta, depth):
+def max_value(state, alpha, beta, depth, upper):
     if depth >= MAX_DEPTH:
-        return simple_eval_state(state)
+        return complex_eval_state(state)
     max_score = -9999
     bese_action = None
-    for action in action_list(state, False):
-        new_state = copy.deepcopy(state)
-        update_state(action.to_tuple(), new_state, True)
-        settle(new_state)
-        score = min_value(new_state, alpha, beta, depth+1)
+    action_list = get_action_list(state, True, upper)
+    for action in action_list:
+        new_state = state_copy(state)
+        f_t = update_state(new_state, action, True)
+        settle(new_state, f_t, None)
+        score = min_value(new_state, alpha, beta, depth+1, upper)
 
         if score > max_score:
             max_score = score
@@ -99,15 +256,16 @@ def max_value(state, alpha, beta, depth):
             alpha = max_score
     return max_score
 
-def min_value(state, alpha, beta, depth):
+def min_value(state, alpha, beta, depth, upper):
     if depth >= MAX_DEPTH:
-        return simple_eval_state(state)
+        return complex_eval_state(state)
     min_score = 9999
-    for action in action_list(state,False):
-        new_state = copy.deepcopy(state)
-        update_state(action.to_tuple(), new_state, False)
-        settle(new_state)
-        score = max_value(new_state, alpha, beta, depth+1)
+    action_list = get_action_list(state, False, upper)
+    for action in action_list:
+        new_state = state_copy(state)
+        e_t = update_state(new_state, action, False)
+        settle(new_state, None, e_t)
+        score = max_value(new_state, alpha, beta, depth+1, upper)
 
         if score < min_score:
             min_score = score
@@ -117,27 +275,3 @@ def min_value(state, alpha, beta, depth):
         if min_score < beta:
             beta = min_score
     return min_score
-
-def game_theory_matrix(state):
-    v = []
-    for i in state.friendly_list:
-        row = []
-        for j in state.enemy_list:
-            row.append(can_defeat(i, j) * 20/dist_to(i, j))
-        v.append(row)
-    return v
-
-def simple_game_theory(state):
-    new_state = copy.deepcopy(state)
-    friendly_action = action_list(new_state, True)
-    enemy_action = action_list(new_state, False)
-    for i in friendly_action:
-        new_state_1 = copy.deepcopy(new_state)
-        update_state(i.to_tuple(), new_state_1, True)
-        for j in enemy_action:
-            new_state_2 = copy.deepcopy(new_state_1)
-            update_state(j.to_tuple(), new_state_2, False)
-            print(game_theory_matrix(new_state_2))
-            s,v = solve_game(game_theory_matrix(new_state_2))
-            # print(s,v)
-    return random.choice(friendly_action)
