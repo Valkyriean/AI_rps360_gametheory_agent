@@ -70,3 +70,4 @@ def main():
         comment(e)
     # If it's another kind of error then it might be coming from the player
     # itself? Then, a traceback will be more helpful. Don't handle this.
+    return result
