@@ -15,7 +15,7 @@ def stdoutIO(stdout=None):
 
 # script_descriptor = open("referee/__main__.py")
 # game = script_descriptor.read()
-sys.argv =  ["referee","ACCESS_GRANTED", "greedy_simple"]
+sys.argv =  ["referee", "-v 0","ACCESS_GRANTED", "game_simple"]
 
 upper = 0
 lower = 0
@@ -35,6 +35,7 @@ for x in range(0,100):
         lower +=1
     else:
         draw += 1
+    print("turn: ", x)
     print("Upper win: ", upper)
     print("lower win:", lower)
     print("draw: ", draw)
