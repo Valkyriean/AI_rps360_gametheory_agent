@@ -1,9 +1,9 @@
 from ACCESS_GRANTED.util import *
 
 def simple_eval_state(state):
-    friendly = (8-state[2])*1.08 + len(state[0])
-    enemy = (8-state[3])*1.08 + len(state[1])
-    base = (friendly - enemy)*100 + 1000
+    friendly = (8-state[2])*101 + len(state[0])*100
+    enemy = (8-state[3])*101 + len(state[1])*100
+    base = (friendly - enemy)
     return base
 
 
@@ -25,9 +25,8 @@ def dist_to_friendly(token, friendly_list):
 def complex_eval_state(state):
     throw_adv = (8-state[2]) - (8-state[3])
     field_adv = len(state[0]) - len(state[1])
-    # friendly = (8-state[2])*1.01 + len(state[0])
-    # enemy = (8-state[3])*1.01 + len(state[1])
-    base = (throw_adv*1.01 + field_adv) * 100
+
+    base = (throw_adv*110 + field_adv*100)
     for enemy in state[1]:
         dist = dist_to_friendly(enemy, state[0])
         if dist != 999 and (10 - dist) > 0:
@@ -35,5 +34,5 @@ def complex_eval_state(state):
     for friendly in state[0]:
         dist = dist_to_friendly(friendly, state[0])
         if dist != 999 and (10 - dist) > 0:
-            base += (10 - dist)*0.1
+            base += (10 - dist)*0.5
     return base

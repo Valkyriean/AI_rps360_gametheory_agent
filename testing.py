@@ -4,45 +4,53 @@ from io import StringIO
 import contextlib
 from referee.main import *
 
-@contextlib.contextmanager
-def stdoutIO(stdout=None):
-    old = sys.stdout
-    if stdout is None:
-        stdout = StringIO()
-    sys.stdout = stdout
-    yield stdout
-    sys.stdout = old
-
-# script_descriptor = open("referee/__main__.py")
-# game = script_descriptor.read()
-sys.argv =  ["referee", "-v 0","ACCESS_GRANTED", "game_simple"]
-
-upper = 0
-lower = 0
-draw = 0
 
 
+sys.argv =  ["referee", "-v 0","ACCESS_GRANTED", "random_player"]
 
-result = []
+exp_score = 50
+t_weight = 100
+f_weight = 1
+e_weight = 1
 
-for x in range(0,100):
-    out = main()
-    result.append(out)
-    print(out)
-    if "upper" in out:
-        upper +=1
-    elif "lower" in out:
-        lower +=1
-    else:
-        draw += 1
-    print("turn: ", x)
+
+def test_score(rounds):
+    upper = 0
+    lower = 0
+    draw = 0
+    result = []
+    for x in range(0,rounds):
+        out = main()
+        result.append(out)
+        print(out)
+        if "upper" in out:
+            upper +=1
+        elif "lower" in out:
+            lower +=1
+        else:
+            draw += 1
+        print("turn: ", x)
+        print("Upper win: ", upper)
+        print("lower win:", lower)
+        print("draw: ", draw)
+    print(result)
     print("Upper win: ", upper)
     print("lower win:", lower)
     print("draw: ", draw)
+    return upper+0.5*draw
 
 
-print(result)
-print("Upper win: ", upper)
-print("lower win:", lower)
-print("draw: ", draw)
 
+def learn_weight(weight, exp_score):
+    hist = 0
+    score = 0
+    test_weight = weight
+    while(score < exp_score):
+        score = test_score(100)
+        if (score<hist):
+            hist = score
+            weight += 1
+        else:
+            break
+        
+test_score(100)
