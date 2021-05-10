@@ -20,7 +20,6 @@ class Player:
         self.time_spent += (time.process_time() - start)
         return action
 
-
     def update(self, opponent_action, player_action):
         f_token = update_state(self.state, player_action, True)
         e_token = update_state(self.state, opponent_action, False)

@@ -1,18 +1,19 @@
 from ACCESS_GRANTED.util import *
 
+# Tactics evaluation for greedy search
 def simple_eval_state(state):
     friendly = (8-state[2])*101 + len(state[0])*100
     enemy = (8-state[3])*101 + len(state[1])*100
     base = (friendly - enemy)
     return base
 
-
+# Distance between two token
 def dist_to(friednly, enemy):
     (r_o, q_o) = friednly
     (r_e, q_e) = enemy
     return max(abs(r_e - r_o), abs(q_e - q_o), abs(q_o - q_e + r_o - r_e))
 
-
+# Distance from nearest token in friendly list to given token
 def dist_to_friendly(token, friendly_list):
     min_dist = 999
     for friendly in friendly_list:
@@ -22,10 +23,10 @@ def dist_to_friendly(token, friendly_list):
                 min_dist = dist
     return min_dist
 
+# Strategic evaluation for game theory
 def complex_eval_state(state):
     throw_adv = (8-state[2]) - (8-state[3])
     field_adv = len(state[0]) - len(state[1])
-
     base = (throw_adv*110 + field_adv*100)
     for enemy in state[1]:
         dist = dist_to_friendly(enemy, state[0])

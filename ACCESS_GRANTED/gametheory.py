@@ -79,7 +79,7 @@ def solve_game(V, maximiser=True, rowplayer=True):
 class OptimisationError(Exception):
     """For if the optimiser reports failure."""
 
-
+# Return action randomly choose with weight of mixed strategy
 def game_theory(state, upper):
     matrix = []
     friendly_action_list = get_action_list(state, True, upper)
@@ -99,6 +99,7 @@ def game_theory(state, upper):
                 row = []
                 duplicate.append(friendly_action)
                 break
+            # 2 Stage Game theory
             # friendly_action_list2 = get_action_list(new_state2, True, upper)
             # enemy_action_list2 = get_action_list(new_state2, False, not upper)
             

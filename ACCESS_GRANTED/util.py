@@ -3,10 +3,11 @@ import time
 
 global history
 history = collections.Counter()
+move_vector_list = [(0, -1), (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0)]
+
 # global update_time
 # update_time = 0
 
-move_vector_list = [(0, -1), (1, -1), (1, 0), (0, 1), (-1, 1), (-1, 0)]
 
 # check whether can eliminate enemy token
 def can_defeat(player, opponent):
@@ -17,6 +18,7 @@ def can_defeat(player, opponent):
     else:
         return -1
 
+#update state with given action
 def update_state(state, action, isFriendly):
     # start = time.process_time()
     act_t = action[0]
@@ -50,6 +52,7 @@ def update_state(state, action, isFriendly):
 # global settle_t
 # settle_t = 0
 
+# Settle the state after update
 def settle(state, f_token, e_token):
     # start = time.process_time()
     f_list = state[0].copy()
@@ -73,7 +76,6 @@ def settle(state, f_token, e_token):
             elif defeat is -1 and e_token in state[1]:
                 state[1].remove(e_token)
                 kill += 1       
-
     for opponent_token in e_list:
         if f_token != None and f_token[1] == opponent_token[1]:
             defeat = can_defeat(f_token[0], opponent_token[0])
@@ -91,7 +93,6 @@ def settle(state, f_token, e_token):
             elif defeat is -1 and e_token in state[1]:
                 state[1].remove(e_token)
                 kill += 1   
-
     # global settle_t 
     # settle_t += (time.process_time() - start)
     return kill, lost
@@ -100,7 +101,7 @@ def settle(state, f_token, e_token):
 #     global settle_t
 #     print("Settle time is: " + str(settle_t))
 
-
+# Check if the cord is in the bound of board
 def out_bound(cord):
     if abs(cord[0]) > 4 or abs(cord[1]) > 4 or abs(cord[0] + cord[1]) > 4:
         return True
@@ -110,7 +111,8 @@ def out_bound(cord):
 # global list_time
 # list_time = 0
 
-def get_action_list(state, friednly, upper):
+# Return the valid action list
+def get_action_list(state, friendly, upper):
     # start = time.process_time()
     action_list = []
     slide_list = []
@@ -120,7 +122,7 @@ def get_action_list(state, friednly, upper):
     token_list = state[0]
     opponent_list = state[1]
     thrown = state[2]
-    if not friednly:
+    if not friendly:
         token_list = state[1]
         opponent_list = state[0]
         thrown = state[3]
@@ -137,7 +139,6 @@ def get_action_list(state, friednly, upper):
                 surrounding_list.append(tar)
                 slide_list.append(("SLIDE", cord, tar))
                 throw_cord_list.append(tar)
-
         # Get swing list
         for token2 in token_list:
             cord2 = token2[1]
@@ -186,7 +187,7 @@ def get_action_list(state, friednly, upper):
 #     global update_time
 #     print("update time is: " + str(update_time))
 
-
+# Check if the state have been duplicated to avoid draw
 def check_duplicated_state(state, real):
     global history
     curr = snap(state)
@@ -196,7 +197,7 @@ def check_duplicated_state(state, real):
         return False
     return True
 
-
+# take a snap of current state
 def snap(state):
     f_tuple = tuple(state[0])
     e_tuple = tuple(state[1])

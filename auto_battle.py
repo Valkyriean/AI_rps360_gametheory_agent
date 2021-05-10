@@ -1,4 +1,3 @@
-
 import sys
 from io import StringIO
 import contextlib
@@ -6,7 +5,7 @@ from referee.main import *
 
 
 
-sys.argv =  ["referee", "-v 0","ACCESS_GRANTED", "random_player"]
+sys.argv =  ["referee", "-v 0","ACCESS_GRANTED", "minimax_ab"]
 
 exp_score = 50
 t_weight = 100
@@ -45,12 +44,19 @@ def learn_weight(weight, exp_score):
     hist = 0
     score = 0
     test_weight = weight
+    step_size = 10
+    increase = True
     while(score < exp_score):
         score = test_score(100)
         if (score<hist):
-            hist = score
-            weight += 1
-        else:
-            break
+
+            if increase:
+                weight -= step_size/2
+                increase = False
+            else:
+                weight += step_size/2
+                increase = True
+        hist = score
+
         
 test_score(100)

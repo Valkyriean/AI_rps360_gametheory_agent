@@ -3,6 +3,7 @@ from ACCESS_GRANTED.state import *
 from ACCESS_GRANTED.util import *
 import random
 
+# Greedy strategy
 def greedy(state, upper):
     best_score = -9999
     best_action_list = []
@@ -14,7 +15,6 @@ def greedy(state, upper):
         if not check_duplicated_state(new_state, False):
             continue
         score = simple_eval_state(new_state)
-
         if score > best_score:
             best_action_list = [action]
             best_score = score

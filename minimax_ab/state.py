@@ -3,7 +3,7 @@ import random
 import copy
 
 MAX_THOROWN = 8
-MAX_DEPTH = 4
+MAX_DEPTH = 2
 
 class State():
     player = None
